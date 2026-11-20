@@ -1,0 +1,618 @@
+{% render 'text-block-styles' %}
+
+{%- liquid
+  assign block_settings = block.settings
+  assign product_resource = closest.product
+  assign selected_variant = product_resource.selected_or_first_available_variant
+
+  comment
+    ============================================================
+    ONLY show custom UI on actual product pages
+    Product cards, quick-add modals, etc. will use default UI
+    ============================================================
+  endcomment
+  assign is_product_page = false
+  if request.page_type == 'product' and template.name == 'product'
+    assign is_product_page = true
+  endif
+-%}
+
+{% liquid
+  if block_settings.type_preset == 'rte' or block_settings.type_preset == 'paragraph'
+    assign is_rte = true
+  endif
+
+  capture text_block_classes
+    if block_settings.width == '100%'
+      echo 'text-block--align-' | append: block_settings.alignment
+      if block_settings.max_width == 'none'
+        echo ' text-block--full-width'
+      endif
+    endif
+    if block_settings.type_preset == 'custom'
+      echo ' custom-typography'
+      if block_settings.font_size != ''
+        echo ' custom-font-size'
+      endif
+      if block_settings.color != ''
+        echo ' custom-color'
+      endif
+    endif
+    if block_settings.background
+      echo ' text-block--background'
+    endif
+    if is_rte
+      echo ' rte'
+    endif
+  endcapture
+%}
+
+{%- if is_product_page -%}
+  {%- comment -%}
+    ============================================================
+    PRODUCT PAGE — CUSTOM RELIEF RANGE PRICE UI
+    ============================================================
+  {%- endcomment -%}
+
+  {%- liquid
+    assign compare_price = 0
+    assign current_price = 0
+    assign savings_percent = 0
+    assign has_discount = false
+
+    if selected_variant != blank
+      assign current_price = selected_variant.price
+
+      if selected_variant.compare_at_price != blank and selected_variant.compare_at_price > 0
+        assign compare_price = selected_variant.compare_at_price
+      endif
+
+      if compare_price == 0 and product_resource.compare_at_price != blank and product_resource.compare_at_price > 0
+        assign compare_price = product_resource.compare_at_price
+      endif
+
+      if compare_price == 0
+        for v in product_resource.variants
+          if v.compare_at_price != blank and v.compare_at_price > 0
+            assign compare_price = v.compare_at_price
+            break
+          endif
+        endfor
+      endif
+    endif
+
+    if compare_price > current_price and current_price > 0
+      assign has_discount = true
+      assign savings_amount = compare_price | minus: current_price
+      assign savings_percent = savings_amount | times: 100.0 | divided_by: compare_price | round
+    endif
+  -%}
+
+  <product-price
+    class="text-block {{ text_block_classes }} text-{{ block_settings.alignment }} {{ block_settings.type_preset | default: 'paragraph' }} spacing-style relief-price-block"
+    data-block-id="{{ block.id }}"
+    data-product-id="{{ product_resource.id }}"
+    style="
+      {% render 'typography-style', settings: block_settings %}
+      {% render 'spacing-style', settings: block_settings %}
+      {% if block_settings.text_color != blank %}
+        --color: {{ block_settings.text_color }};
+        --color-rgb: {{ block_settings.text_color.rgb }};
+      {% endif %}
+      --width: {{ block_settings.width }};
+      --relief-save-bg: {{ block_settings.save_badge_bg | default: '#E8531F' }};
+      --relief-save-text: {{ block_settings.save_badge_text | default: '#FFFFFF' }};
+      --relief-instock-bg: {{ block_settings.instock_bg | default: '#FAF7F2' }};
+      --relief-instock-text: {{ block_settings.instock_text | default: '#1A1A1A' }};
+      --relief-instock-dot: {{ block_settings.instock_dot | default: '#2E9B4F' }};
+    "
+    {{ block.shopify_attributes }}
+  >
+    <div class="relief-price-wrapper" ref="priceContainer">
+      <div class="relief-price-row">
+
+        <span class="relief-price-current">
+          <span class="visually-hidden">{% if has_discount %}Sale price: {% else %}Regular price: {% endif %}</span>
+          {{ current_price | money }}
+        </span>
+
+        <span class="relief-price-compare"{% unless has_discount %} style="display: none;"{% endunless %}>
+          <span class="visually-hidden">Regular price: </span>
+          {{ compare_price | money }}
+        </span>
+
+        {%- if block_settings.show_save_badge -%}
+          <span class="relief-price-save-badge"{% unless has_discount %} style="display: none;"{% endunless %}>
+            SAVE {{ savings_percent }}% OFF
+          </span>
+        {%- endif -%}
+
+      </div>
+
+      {%- if block_settings.show_instock_badge -%}
+        {%- liquid
+          assign stock_status_class = 'relief-instock--out'
+          assign stock_text = block_settings.instock_text_out | default: 'Out of stock'
+          assign show_dot = false
+
+          if selected_variant.available
+            assign stock_status_class = 'relief-instock--in'
+            assign stock_text = block_settings.instock_text_in | default: 'IN STOCK — Ships within 1–2 business days'
+            assign show_dot = true
+          endif
+        -%}
+
+        <div class="relief-instock-badge {{ stock_status_class }}">
+          {%- if show_dot -%}
+            <span class="relief-instock-dot" aria-hidden="true"></span>
+          {%- else -%}
+            <span class="relief-instock-dot relief-instock-dot--out" aria-hidden="true"></span>
+          {%- endif -%}
+          <span class="relief-instock-text">{{ stock_text }}</span>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {% if block_settings.show_tax_info %}
+      <div class="tax-note">
+        {%- if cart.duties_included and cart.taxes_included -%}
+          {{ 'content.duties_and_taxes_included' | t }}
+        {%- elsif cart.taxes_included -%}
+          {{ 'content.taxes_included' | t }}
+        {%- elsif cart.duties_included -%}
+          {{ 'content.duties_included' | t }}
+        {%- endif -%}
+
+        {%- if shop.shipping_policy.body != blank -%}
+          {{ 'content.shipping_policy' | t }}
+        {%- endif -%}
+      </div>
+    {% endif %}
+
+    {%- if selected_variant != blank and block_settings.show_installments -%}
+      <div class="installments">
+        {%- assign product_form_installment_id = 'product-form-installment-' | append: block.id -%}
+        {%- form 'product', product_resource, id: product_form_installment_id, class: 'payment-terms' -%}
+          <input type="hidden" name="id" value="{{ selected_variant.id }}">
+          {{ form | payment_terms }}
+        {%- endform -%}
+      </div>
+    {%- endif -%}
+  </product-price>
+
+  {%- comment -%}
+    ============================================================
+    STYLES — Only loaded on product page
+    ============================================================
+  {%- endcomment -%}
+  <style>
+    .relief-price-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .relief-price-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .relief-price-current {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #111111;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .relief-price-compare {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #999999;
+      text-decoration: line-through;
+      text-decoration-thickness: 1.5px;
+      letter-spacing: 0;
+      line-height: 1.1;
+    }
+
+    .relief-price-save-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 12px;
+      background: var(--relief-save-bg, #E8531F);
+      color: var(--relief-save-text, #FFFFFF);
+      font-size: 0.6875rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .relief-instock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: var(--relief-instock-bg, #FAF7F2);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 10px;
+      width: fit-content;
+      max-width: 100%;
+    }
+
+    .relief-instock-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--relief-instock-dot, #2E9B4F);
+      flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(46, 155, 79, 0.15);
+    }
+
+    .relief-instock-dot--out {
+      background: #C8C8C8;
+      box-shadow: 0 0 0 3px rgba(200, 200, 200, 0.2);
+    }
+
+    .relief-instock-text {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--relief-instock-text, #1A1A1A);
+      letter-spacing: 0.01em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    @media screen and (max-width: 749px) {
+      .relief-price-current { font-size: 1.25rem; }
+      .relief-price-compare { font-size: 0.875rem; }
+      .relief-price-save-badge { font-size: 0.625rem; padding: 4px 10px; }
+      .relief-instock-text { font-size: 0.75rem; }
+      .relief-instock-badge { padding: 7px 12px; }
+    }
+
+    .relief-price-save-badge:focus-visible,
+    .relief-instock-badge:focus-visible {
+      outline: 2px solid #E8531F;
+      outline-offset: 2px;
+    }
+  </style>
+
+{%- else -%}
+  {%- comment -%}
+    ============================================================
+    PRODUCT CARDS / OTHER PAGES — DEFAULT ORIGINAL PRICE UI
+    Kept exactly as it was before — no custom styling
+    ============================================================
+  {%- endcomment -%}
+
+  <product-price
+    class="text-block {{ text_block_classes }} text-{{ block_settings.alignment }} {{ block_settings.type_preset | default: 'paragraph' }} spacing-style"
+    data-block-id="{{ block.id }}"
+    data-product-id="{{ product_resource.id }}"
+    style="
+      {% render 'typography-style', settings: block_settings %}
+      {% render 'spacing-style', settings: block_settings %}
+      {% if block_settings.text_color != blank %}
+        --color: {{ block_settings.text_color }};
+        --color-rgb: {{ block_settings.text_color.rgb }};
+      {% endif %}
+      --width: {{ block_settings.width }};
+    "
+    {{ block.shopify_attributes }}
+  >
+    {% render 'price',
+      show_unit_price: true,
+      product_resource: product_resource,
+      show_sale_price_first: block_settings.show_sale_price_first
+    %}
+
+    {% if block_settings.show_tax_info %}
+      <div class="tax-note">
+        {%- if cart.duties_included and cart.taxes_included -%}
+          {{ 'content.duties_and_taxes_included' | t }}
+        {%- elsif cart.taxes_included -%}
+          {{ 'content.taxes_included' | t }}
+        {%- elsif cart.duties_included -%}
+          {{ 'content.duties_included' | t }}
+        {%- endif -%}
+
+        {%- if shop.shipping_policy.body != blank -%}
+          {{ 'content.shipping_policy' | t }}
+        {%- endif -%}
+      </div>
+    {% endif %}
+
+    {%- if selected_variant != blank and block_settings.show_installments -%}
+      <div class="installments">
+        {%- assign product_form_installment_id = 'product-form-installment-' | append: block.id -%}
+        {%- form 'product', product_resource, id: product_form_installment_id, class: 'payment-terms' -%}
+          <input type="hidden" name="id" value="{{ selected_variant.id }}">
+          {{ form | payment_terms }}
+        {%- endform -%}
+      </div>
+    {%- endif -%}
+  </product-price>
+{%- endif -%}
+
+{% render 'payment-terms-styles' %}
+
+{% schema %}
+{
+  "name": "t:names.product_price",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.resource_reference_product_price"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:content.edit_price_in_theme_settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sale_price_first",
+      "label": "t:settings.show_sale_price_first",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Save Badge (Product Page Only)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_save_badge",
+      "label": "Show SAVE % OFF badge",
+      "default": true,
+      "info": "Auto-calculated. Only shows on product page when compare-at price is set."
+    },
+    {
+      "type": "color",
+      "id": "save_badge_bg",
+      "label": "Save badge background",
+      "default": "#E8531F"
+    },
+    {
+      "type": "color",
+      "id": "save_badge_text",
+      "label": "Save badge text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "In Stock Badge (Product Page Only)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_instock_badge",
+      "label": "Show In Stock badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "instock_text_in",
+      "label": "In Stock text",
+      "default": "IN STOCK — Ships within 1–2 business days"
+    },
+    {
+      "type": "text",
+      "id": "instock_text_out",
+      "label": "Out of Stock text",
+      "default": "Out of stock"
+    },
+    {
+      "type": "color",
+      "id": "instock_bg",
+      "label": "In Stock badge background",
+      "default": "#FAF7F2"
+    },
+    {
+      "type": "color",
+      "id": "instock_text",
+      "label": "In Stock badge text",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "instock_dot",
+      "label": "In Stock dot color",
+      "default": "#2E9B4F"
+    },
+    {
+      "type": "header",
+      "content": "Installments & Tax"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_installments",
+      "label": "t:settings.installments",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tax_info",
+      "label": "t:settings.show_tax_info",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:content.typography"
+    },
+    {
+      "type": "select",
+      "id": "type_preset",
+      "label": "t:settings.preset",
+      "options": [
+        { "value": "", "label": "t:options.default" },
+        { "value": "paragraph", "label": "t:options.paragraph" },
+        { "value": "h1", "label": "t:options.h1" },
+        { "value": "h2", "label": "t:options.h2" },
+        { "value": "h3", "label": "t:options.h3" },
+        { "value": "h4", "label": "t:options.h4" },
+        { "value": "h5", "label": "t:options.h5" },
+        { "value": "h6", "label": "t:options.h6" },
+        { "value": "custom", "label": "t:options.custom" }
+      ],
+      "info": "t:info.edit_presets_in_theme_settings"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:settings.width",
+      "options": [
+        { "value": "fit-content", "label": "t:options.fit_content" },
+        { "value": "100%", "label": "t:options.fill" }
+      ],
+      "default": "100%"
+    },
+    {
+      "type": "text_alignment",
+      "id": "alignment",
+      "label": "t:settings.alignment",
+      "default": "left",
+      "visible_if": "{{ block.settings.width != 'fit-content' }}"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "t:settings.font",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "t:options.body" },
+        { "value": "var(--font-subheading--family)", "label": "t:options.subheading" },
+        { "value": "var(--font-heading--family)", "label": "t:options.heading" },
+        { "value": "var(--font-accent--family)", "label": "t:options.accent" }
+      ],
+      "default": "var(--font-body--family)",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "t:settings.size",
+      "options": [
+        { "value": "", "label": "t:options.default" },
+        { "value": "0.625rem", "label": "10px" },
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" },
+        { "value": "1rem", "label": "16px" },
+        { "value": "1.125rem", "label": "18px" },
+        { "value": "1.25rem", "label": "20px" },
+        { "value": "1.5rem", "label": "24px" },
+        { "value": "2rem", "label": "32px" },
+        { "value": "2.5rem", "label": "40px" },
+        { "value": "3rem", "label": "48px" },
+        { "value": "3.5rem", "label": "56px" },
+        { "value": "4.5rem", "label": "72px" },
+        { "value": "5.5rem", "label": "88px" },
+        { "value": "7.5rem", "label": "120px" },
+        { "value": "9.5rem", "label": "152px" },
+        { "value": "11.5rem", "label": "184px" }
+      ],
+      "default": "1rem",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "line_height",
+      "label": "t:settings.line_height",
+      "options": [
+        { "value": "tight", "label": "t:options.tight" },
+        { "value": "normal", "label": "t:options.normal" },
+        { "value": "loose", "label": "t:options.loose" }
+      ],
+      "default": "normal",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "letter_spacing",
+      "label": "t:settings.letter_spacing",
+      "options": [
+        { "value": "tight", "label": "t:options.tight" },
+        { "value": "normal", "label": "t:options.normal" },
+        { "value": "loose", "label": "t:options.loose" }
+      ],
+      "default": "normal",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "case",
+      "label": "t:settings.case",
+      "options": [
+        { "value": "none", "label": "t:options.default" },
+        { "value": "uppercase", "label": "t:options.uppercase" }
+      ],
+      "default": "none",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:settings.text_color",
+      "placeholder": "t:settings.default"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_price",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,94 @@
+{%- assign current_time = 'now' | date: '%s' | plus: 0 -%}
+{%- assign end_time = settings.halloween_end_date | default: '2026-11-30T23:59:59' | date: '%s' | plus: 0 -%}
+{%- assign halloween_active = false -%}
+{%- if settings.halloween_enabled and current_time <= end_time -%}
+  {%- assign halloween_active = true -%}
+{%- endif -%}
+
+{%- if halloween_active -%}
+  <aside 
+    class="hw-sticky-promo-bar bfcm-sticky-promo-bar" 
+    id="hwStickyPromoBar-{{ section.id }}" 
+    role="complementary" 
+    aria-label="Black Friday Promotional Reminder"
+  >
+    <div class="hw-sticky-bar-inner">
+      <div class="hw-sticky-left">
+        <span class="hw-sticky-pumpkin" aria-hidden="true">⚡</span>
+        <span class="hw-sticky-msg">
+          <strong>Black Friday Storewide Sale:</strong> 
+          <span class="hw-sticky-subtext">Up to 70% off storewide</span>
+        </span>
+      </div>
+
+      <div class="hw-sticky-center">
+        <div class="bfcm-sticky-auto-pill">
+          <span>✦ Automatic Storewide Savings Applied</span>
+        </div>
+      </div>
+
+      <div class="hw-sticky-right">
+        <span class="hw-sticky-shipping">🚚 Free US Shipping on Orders Over $50</span>
+        <button 
+          type="button" 
+          class="hw-sticky-close" 
+          id="hwStickyClose-{{ section.id }}" 
+          aria-label="Dismiss Halloween offer banner"
+          onclick="document.getElementById('hwStickyPromoBar-{{ section.id }}').style.display='none'; sessionStorage.setItem('hw_sticky_bar_dismissed', 'true');"
+        >
+          &times;
+        </button>
+      </div>
+    </div>
+
+    <script>
+      (function() {
+        const bar = document.getElementById('hwStickyPromoBar-{{ section.id }}');
+        if (!bar) return;
+
+        // Check if user previously dismissed in this session
+        if (sessionStorage.getItem('hw_sticky_bar_dismissed') === 'true') {
+          bar.style.display = 'none';
+          return;
+        }
+
+        // Show sticky bar only after scrolling down 200px
+        let shown = false;
+        function checkScroll() {
+          if (window.scrollY > 200) {
+            if (!shown) {
+              bar.classList.add('hw-visible');
+              shown = true;
+            }
+          } else {
+            if (shown) {
+              bar.classList.remove('hw-visible');
+              shown = false;
+            }
+          }
+        }
+        window.addEventListener('scroll', checkScroll, { passive: true });
+        checkScroll();
+      })();
+    </script>
+  </aside>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Halloween Sticky Bar",
+  "tag": "section",
+  "class": "section-halloween-sticky-promo-bar",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Floating bottom bar displaying live sale countdown, 1-click discount copy, and shipping reminder on collection pages."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Halloween Sticky Bar"
+    }
+  ]
+}
+{% endschema %}

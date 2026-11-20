@@ -1,0 +1,11 @@
+{%- doc -%}
+  Renders product variant picker. Alias to variant-main-picker for Horizon theme.
+{%- enddoc -%}
+
+{%- assign effective_product = product_resource | default: product -%}
+{% render 'variant-main-picker',
+  product_resource: effective_product,
+  block: block,
+  section: section,
+  product: product
+%}

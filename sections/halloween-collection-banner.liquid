@@ -1,0 +1,95 @@
+{%- assign current_time = 'now' | date: '%s' | plus: 0 -%}
+{%- assign end_time = settings.halloween_end_date | default: '2026-11-30T23:59:59' | date: '%s' | plus: 0 -%}
+{%- assign halloween_active = false -%}
+{%- if settings.halloween_enabled and current_time <= end_time -%}
+  {%- assign halloween_active = true -%}
+{%- endif -%}
+
+{%- if halloween_active -%}
+  <section class="hw-col-banner bfcm-col-banner" id="hwColBanner-{{ section.id }}" aria-label="Black Friday Sale Collection Banner">
+    <div class="hw-col-banner-inner page-width">
+      <div class="hw-col-banner-content">
+        <!-- Seasonal Tag -->
+        <div class="hw-col-badge bfcm-col-badge">
+          <span class="hw-col-badge-icon" aria-hidden="true">⚡</span>
+          <span>{{ section.settings.badge_text | default: 'BLACK FRIDAY VIP EVENT' }}</span>
+        </div>
+
+        <!-- Heading -->
+        <h2 class="hw-col-title">
+          {{ section.settings.title | default: collection.title | default: 'Black Friday Wellness Collection' }}
+        </h2>
+
+        <!-- Subheading -->
+        <p class="hw-col-description">
+          {{ section.settings.description | default: 'Exclusive Black Friday savings on clinically-inspired pain relief, joint mobility, and everyday recovery essentials. Up to 70% OFF storewide!' }}
+        </p>
+
+        <!-- Live Countdown & Promo Code Row -->
+        <div class="hw-col-meta-row">
+          {%- if section.settings.show_countdown -%}
+            <div class="hw-col-timer-wrap bfcm-col-timer-wrap">
+              <span class="hw-col-timer-label">VIP Sale ends in:</span>
+              <div class="hw-col-timer-boxes" aria-live="off">
+                <span class="hw-col-time-box"><strong class="hw-days">00</strong>d</span>
+                <span class="hw-col-time-box"><strong class="hw-hours">00</strong>h</span>
+                <span class="hw-col-time-box"><strong class="hw-mins">00</strong>m</span>
+                <span class="hw-col-time-box"><strong class="hw-secs">00</strong>s</span>
+              </div>
+            </div>
+          {%- endif -%}
+
+            <div class="bfcm-col-auto-pill">
+              <span class="bfcm-col-auto-icon">✦</span>
+              <span class="bfcm-col-auto-text">Up to 70% Off Storewide &bull; Automatic Savings Applied</span>
+            </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Halloween Collection Hero",
+  "tag": "section",
+  "class": "section-halloween-collection-banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Seasonal Badge",
+      "default": "⚡ Limited-Time Black Friday VIP Sale"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "⚡ Black Friday Wellness Collection"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Exclusive VIP doorbuster savings on all-natural pain relief, mobility care, and everyday relaxation essentials. Premium wellness, maximum savings!"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_countdown",
+      "label": "Show Live Countdown Clock",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_decorations",
+      "label": "Show Bats & Cobweb Accents",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Halloween Collection Hero"
+    }
+  ]
+}
+{% endschema %}

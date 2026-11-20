@@ -1,0 +1,125 @@
+{%- doc -%}
+  Renders the 4 clean Healtence Feature / Value Proposition cards without broken SVG or capsule overlays.
+{%- enddoc -%}
+
+<section class="hw-features-section" aria-label="Store Guarantees and Features">
+  <div class="hw-features-grid">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="hw-feature-card" {{ block.shopify_attributes }}>
+          {%- if block.settings.icon != blank -%}
+            <span class="hw-feature-icon" aria-hidden="true">{{ block.settings.icon }}</span>
+          {%- endif -%}
+          <h3 class="feature-title">{{ block.settings.title | escape }}</h3>
+          <p class="feature-desc">{{ block.settings.description | escape }}</p>
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="hw-feature-card">
+        <h3 class="feature-title">{{ section.settings.title_1 | default: 'Trusted Quality' }}</h3>
+        <p class="feature-desc">{{ section.settings.desc_1 | default: 'High-quality products crafted with care to ensure durability and satisfaction.' }}</p>
+      </div>
+      <div class="hw-feature-card">
+        <h3 class="feature-title">{{ section.settings.title_2 | default: 'Exclusive Savings' }}</h3>
+        <p class="feature-desc">{{ section.settings.desc_2 | default: 'Enjoy great discounts on essentials designed to make your life easier and better.' }}</p>
+      </div>
+      <div class="hw-feature-card">
+        <h3 class="feature-title">{{ section.settings.title_3 | default: 'Fast & Secure Delivery' }}</h3>
+        <p class="feature-desc">{{ section.settings.desc_3 | default: 'Swift, safe shipping that delivers your order right to your doorstep without hassle.' }}</p>
+      </div>
+      <div class="hw-feature-card">
+        <h3 class="feature-title">{{ section.settings.title_4 | default: 'Dedicated Support' }}</h3>
+        <p class="feature-desc">{{ section.settings.desc_4 | default: 'Our friendly team is always here to help you every step of the way.' }}</p>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Halloween Feature Cards",
+  "tag": "section",
+  "class": "section-halloween-features",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title_1",
+      "label": "Card 1 Title",
+      "default": "Trusted Quality"
+    },
+    {
+      "type": "textarea",
+      "id": "desc_1",
+      "label": "Card 1 Description",
+      "default": "High-quality products crafted with care to ensure durability and satisfaction."
+    },
+    {
+      "type": "text",
+      "id": "title_2",
+      "label": "Card 2 Title",
+      "default": "Exclusive Savings"
+    },
+    {
+      "type": "textarea",
+      "id": "desc_2",
+      "label": "Card 2 Description",
+      "default": "Enjoy great discounts on essentials designed to make your life easier and better."
+    },
+    {
+      "type": "text",
+      "id": "title_3",
+      "label": "Card 3 Title",
+      "default": "Fast & Secure Delivery"
+    },
+    {
+      "type": "textarea",
+      "id": "desc_3",
+      "label": "Card 3 Description",
+      "default": "Swift, safe shipping that delivers your order right to your doorstep without hassle."
+    },
+    {
+      "type": "text",
+      "id": "title_4",
+      "label": "Card 4 Title",
+      "default": "Dedicated Support"
+    },
+    {
+      "type": "textarea",
+      "id": "desc_4",
+      "label": "Card 4 Description",
+      "default": "Our friendly team is always here to help you every step of the way."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (Emoji)",
+          "default": "✨"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Trusted Quality"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "High-quality products crafted with care to ensure durability and satisfaction."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Halloween Feature Cards"
+    }
+  ]
+}
+{% endschema %}

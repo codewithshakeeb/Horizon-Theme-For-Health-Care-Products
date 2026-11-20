@@ -1,0 +1,153 @@
+{
+  "sections": {
+    "faq": {
+      "type": "healtence-faq-page",
+      "settings": {
+        "heading": "Frequently Asked Questions",
+        "subtitle": "Everything you need to know about our ergonomic pain-relief products, US shipping policies, 30-day returns, and customer care.",
+        "show_contact_card": true,
+        "contact_heading": "Still Have Questions?",
+        "contact_text": "Our customer support team is here to assist you Monday through Friday, 9:00 AM to 5:00 PM EST."
+      },
+      "blocks": {
+        "cat_shipping": {
+          "type": "category",
+          "settings": {
+            "heading": "Shipping & Delivery"
+          }
+        },
+        "faq_shipping_cost": {
+          "type": "faq",
+          "settings": {
+            "question": "How much does shipping cost?",
+            "answer": "<p>We offer free standard US shipping on all orders over $50. Orders under $50 ship for a flat rate of $4.90 (Economy) within the United States.</p>"
+          }
+        },
+        "faq_shipping_times": {
+          "type": "faq",
+          "settings": {
+            "question": "What are your handling and transit times?",
+            "answer": "<p>Orders are processed within 1–2 business days (Monday–Friday). US transit time is typically 5–10 business days. Where international shipping is available, transit takes 7–15 business days.</p>"
+          }
+        },
+        "faq_tracking": {
+          "type": "faq",
+          "settings": {
+            "question": "How do I track my order?",
+            "answer": "<p>Once your order ships, we send a shipping confirmation email with your carrier tracking number and direct tracking link. Tracking information typically activates within 24–48 hours of departure.</p>"
+          }
+        },
+        "faq_wrong_address": {
+          "type": "faq",
+          "settings": {
+            "question": "Can I change my shipping address after ordering?",
+            "answer": "<p>Please contact us immediately at <a href=\"mailto:admin@healtence.com\">admin@healtence.com</a> or call <a href=\"tel:+13042371573\">+1 304-237-1573</a> if you need to correct your address. If your order has not yet been processed by our fulfillment center, we will gladly update it. Once an order is fulfilled or in transit, address modifications cannot be made.</p>"
+          }
+        },
+        "cat_returns": {
+          "type": "category",
+          "settings": {
+            "heading": "Returns, Refunds & Cancellations"
+          }
+        },
+        "faq_return_policy": {
+          "type": "faq",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>We offer a 30-day return window from the date of delivery. Items must be in their original, unused condition with all original packaging and accessories. We provide free return shipping within the United States with zero restocking fees.</p>"
+          }
+        },
+        "faq_refund_timeline": {
+          "type": "faq",
+          "settings": {
+            "question": "How and when will I receive my refund?",
+            "answer": "<p>Once your return is received and inspected at our warehouse, approved refunds are processed back to your original payment method within 5–10 business days. Your financial institution may require additional processing time to reflect the credit.</p>"
+          }
+        },
+        "faq_damaged_items": {
+          "type": "faq",
+          "settings": {
+            "question": "What if my item arrives damaged, defective, or incorrect?",
+            "answer": "<p>Please inspect your order upon delivery. If your item is damaged, defective, or incorrect, contact us within 48 hours at <a href=\"mailto:admin@healtence.com\">admin@healtence.com</a> with clear photos of the damage and your packaging. We will immediately issue a free replacement or full refund.</p>"
+          }
+        },
+        "faq_exchanges_cancellations": {
+          "type": "faq",
+          "settings": {
+            "question": "Can I exchange an item or cancel an order?",
+            "answer": "<p>We do not offer direct exchanges. To receive a different item, color, or model, please return your original item for a refund and place a new order. Cancellations are accepted if requested before your order has been fulfilled.</p>"
+          }
+        },
+        "cat_products": {
+          "type": "category",
+          "settings": {
+            "heading": "Products, Sizing & Care"
+          }
+        },
+        "faq_memory_foam_care": {
+          "type": "faq",
+          "settings": {
+            "question": "How do I clean and maintain my memory foam pillow/cushion?",
+            "answer": "<p>The outer zippered cover is machine washable in cold water on a gentle cycle; air dry or tumble dry on low heat. The inner memory foam core should not be machine washed, soaked, or exposed to direct sunlight. Spot clean the memory foam gently with a damp cloth if needed.</p>"
+          }
+        },
+        "faq_sizing_guidance": {
+          "type": "faq",
+          "settings": {
+            "question": "How do I choose the right size or model?",
+            "answer": "<p>Detailed sizing recommendations and dimension charts are provided on each product page. If you are between sizes or unsure which ergonomic model suits your posture or sleep style, our team is happy to provide personalized guidance.</p>"
+          }
+        },
+        "faq_health_disclaimer": {
+          "type": "faq",
+          "settings": {
+            "question": "Are Healtence products medical devices?",
+            "answer": "<p>No. Healtence products are non-invasive ergonomic support aids designed for everyday comfort, posture alignment, and relaxation. They are not medical devices and are not intended to diagnose, treat, cure, or prevent any medical condition or spinal pathology. Always consult a licensed healthcare professional for medical concerns.</p>"
+          }
+        },
+        "cat_about": {
+          "type": "category",
+          "settings": {
+            "heading": "About Healtence & Customer Support"
+          }
+        },
+        "faq_kinwood_operator": {
+          "type": "faq",
+          "settings": {
+            "question": "Who operates Healtence and where are you located?",
+            "answer": "<p>Healtence is owned and operated by Kinwood LLC, a registered US business located at 228 Boarstall Lane, Daniels, WV 25832, United States.</p>"
+          }
+        },
+        "faq_contact_support": {
+          "type": "faq",
+          "settings": {
+            "question": "How can I contact customer support?",
+            "answer": "<p>You can reach our dedicated support team by email at <a href=\"mailto:admin@healtence.com\">admin@healtence.com</a>, by phone at <a href=\"tel:+13042371573\">+1 304-237-1573</a>, or through our <a href=\"/pages/contact\">Contact page</a>. Our support hours are Monday through Friday, 9:00 AM to 5:00 PM EST. We typically reply within 24 business hours.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "cat_shipping",
+        "faq_shipping_cost",
+        "faq_shipping_times",
+        "faq_tracking",
+        "faq_wrong_address",
+        "cat_returns",
+        "faq_return_policy",
+        "faq_refund_timeline",
+        "faq_damaged_items",
+        "faq_exchanges_cancellations",
+        "cat_products",
+        "faq_memory_foam_care",
+        "faq_sizing_guidance",
+        "faq_health_disclaimer",
+        "cat_about",
+        "faq_kinwood_operator",
+        "faq_contact_support"
+      ]
+    }
+  },
+  "order": [
+    "faq"
+  ]
+}

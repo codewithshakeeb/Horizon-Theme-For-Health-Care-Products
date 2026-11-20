@@ -1,0 +1,493 @@
+{%- assign current_time = 'now' | date: '%s' | plus: 0 -%}
+{%- assign end_time = settings.halloween_end_date | default: '2026-11-30T23:59:59' | date: '%s' | plus: 0 -%}
+{%- assign halloween_active = false -%}
+{%- if settings.halloween_enabled and current_time <= end_time -%}
+  {%- assign halloween_active = true -%}
+{%- endif -%}
+
+{%- if halloween_active -%}
+  {%- assign deal_collection = collections[section.settings.collection] -%}
+  {%- assign has_products = false -%}
+  {%- if deal_collection != blank and deal_collection.products_count > 0 -%}
+    {%- assign has_products = true -%}
+  {%- elsif collections.all.products_count > 0 -%}
+    {%- assign deal_collection = collections.all -%}
+    {%- assign has_products = true -%}
+  {%- endif -%}
+
+  <section 
+    class="hw-deals-section page-width bfcm-deals-section" 
+    id="hw-deals-{{ section.id }}" 
+    aria-labelledby="hwDealsHeading-{{ section.id }}"
+    data-autoplay="{{ section.settings.enable_autoplay }}"
+    data-autoplay-speed="{{ section.settings.autoplay_speed | default: 4 }}"
+  >
+    <!-- Deals Header -->
+    <div class="hw-deals-header">
+      <div class="hw-deals-header-text">
+        <span class="bfcm-section-eyebrow">Top-Rated Pain Relief Deals for Black Friday</span>
+        {%- assign deals_clean_title = section.settings.title | default: 'Black Friday Flash Deals – VIP Exclusive' | remove_first: '🎃' | remove_first: '⚡' | strip -%}
+        <h2 id="hwDealsHeading-{{ section.id }}" class="hw-deals-title">
+          <span>{{ deals_clean_title }}</span>
+        </h2>
+        {%- if section.settings.subtitle != blank -%}
+          <p class="hw-deals-subtitle">{{ section.settings.subtitle }}</p>
+        {%- else -%}
+          <p class="hw-deals-subtitle">Limited-stock doorbusters on our highest-rated wellness essentials.</p>
+        {%- endif -%}
+      </div>
+
+      <div class="hw-deals-header-actions">
+        <a href="{{ deal_collection.url | default: '/collections/all' }}" class="hw-deals-view-all bfcm-header-link" aria-label="Explore {{ deals_clean_title | escape }}">
+          <span>Explore Collection</span>
+          <span aria-hidden="true">&rarr;</span>
+        </a>
+
+        <!-- Carousel Navigation Controls -->
+        <div class="hw-carousel-controls" role="group" aria-label="Carousel navigation">
+          <button 
+            type="button" 
+            class="hw-carousel-btn hw-carousel-prev" 
+            id="hwPrev-{{ section.id }}" 
+            aria-label="Previous Slide"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <button 
+            type="button" 
+            class="hw-carousel-btn hw-carousel-next" 
+            id="hwNext-{{ section.id }}" 
+            aria-label="Next Slide"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carousel Viewport & Scroll Track -->
+    <div class="hw-carousel-wrapper">
+      <div 
+        class="hw-carousel-track" 
+        id="hwTrack-{{ section.id }}" 
+        tabindex="0" 
+        role="region" 
+        aria-label="Black Friday Deals Carousel Track"
+      >
+        {%- if has_products -%}
+          {%- for product in deal_collection.products limit: section.settings.products_to_show -%}
+            {%- assign has_discount = false -%}
+            {%- assign save_pct = 0 -%}
+            {%- if product.compare_at_price > product.price -%}
+              {%- assign has_discount = true -%}
+              {%- assign save_pct = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+            {%- endif -%}
+
+            <div class="hw-carousel-card bfcm-carousel-card" data-product-id="{{ product.id }}">
+              <!-- Minimal Luxury Discount Badge -->
+              {%- if has_discount -%}
+                {%- if save_pct >= 40 -%}
+                  <span class="hw-card-badge bfcm-card-badge bfcm-badge-crimson">SAVE {{ save_pct }}%</span>
+                {%- else -%}
+                  <span class="hw-card-badge bfcm-card-badge bfcm-badge-obsidian">SAVE {{ save_pct }}%</span>
+                {%- endif -%}
+              {%- endif -%}
+
+              <!-- Product Image -->
+              <a href="{{ product.url }}" class="hw-card-media" aria-label="{{ product.title | escape }}">
+                {%- if product.featured_image != blank -%}
+                  <img 
+                    src="{{ product.featured_image | image_url: width: 600 }}" 
+                    srcset="{{ product.featured_image | image_url: width: 300 }} 300w, {{ product.featured_image | image_url: width: 600 }} 600w"
+                    sizes="(max-width: 768px) 80vw, 300px"
+                    alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                    loading="lazy"
+                    width="600"
+                    height="600"
+                    class="hw-card-img"
+                  >
+                {%- else -%}
+                  <div class="hw-card-placeholder">
+                    {{ 'product-1' | placeholder_svg_tag: 'hw-placeholder-svg' }}
+                  </div>
+                {%- endif -%}
+              </a>
+
+              <!-- Product Info -->
+              <div class="hw-card-info">
+                {%- if section.settings.show_reviews -%}
+                  <div class="hw-card-rating">
+                    <div class="jdgm-widget jdgm-preview-badge" data-id="{{ product.id }}" data-template="index">
+                      {%- if product.metafields.judgeme.badge != blank -%}
+                        {{ product.metafields.judgeme.badge }}
+                      {%- elsif product.metafields.reviews.rating.value != blank -%}
+                        <span class="hw-stars">★</span>
+                        <span class="hw-review-count">({{ product.metafields.reviews.rating_count }} reviews)</span>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                {%- endif -%}
+
+                <a href="{{ product.url }}" class="hw-card-title">
+                  {{ product.title }}
+                </a>
+
+                <div class="hw-card-pricing">
+                  <span class="hw-price-current">{% if product.price_varies %}From {{ product.price_min | money }}{% else %}{{ product.price | money }}{% endif %}</span>
+                  {%- if product.compare_at_price > product.price -%}
+                    <span class="hw-price-compare">{{ product.compare_at_price | money }}</span>
+                    <span class="hw-price-saving">Save {{ product.compare_at_price | minus: product.price | money }}</span>
+                  {%- endif -%}
+                </div>
+
+                {%- if section.settings.show_quick_add -%}
+                  {%- assign first_variant = product.selected_or_first_available_variant -%}
+                  <button 
+                    type="button" 
+                    class="hw-quick-add-btn bfcm-quick-add-btn" 
+                    data-variant-id="{{ first_variant.id }}" 
+                    data-product-title="{{ product.title | escape }}"
+                    data-price-cents="{{ first_variant.price }}"
+                    data-agent-action="quick-add-to-cart"
+                    {% unless product.available %}disabled{% endunless %}
+                    aria-label="Add {{ product.title | escape }} to cart"
+                  >
+                    {%- if product.available -%}
+                      <span class="hw-btn-icon" aria-hidden="true">⚡</span>
+                      <span class="hw-btn-text">Quick Add</span>
+                    {%- else -%}
+                      <span>Sold Out</span>
+                    {%- endif -%}
+                  </button>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endfor -%}
+
+        {%- else -%}
+          <!-- Mock Curated Deals for Preview / Empty Collection -->
+          {%- assign mock_products = "Herbal Joint Comfort Cream:3200:4200:24|Deep Tissue Magnesium Spray:2600:3500:26|Ergonomic Lumbar Spine Stretcher:4400:5900:25|Acupressure Neck Relief Cloud Pillow:3800:5000:24" | split: "|" -%}
+          {%- for mock in mock_products -%}
+            {%- assign mock_parts = mock | split: ":" -%}
+            {%- assign mock_title = mock_parts[0] -%}
+            {%- assign mock_price = mock_parts[1] | times: 1 -%}
+            {%- assign mock_compare = mock_parts[2] | times: 1 -%}
+            {%- assign mock_pct = mock_parts[3] -%}
+
+            <div class="hw-carousel-card">
+              <span class="hw-card-badge bfcm-card-badge bfcm-badge-obsidian">SAVE {{ mock_pct }}%</span>
+              <a href="/collections/all" class="hw-card-media">
+                <div class="hw-card-placeholder hw-mock-art">
+                  <div class="hw-mock-icon">🌿</div>
+                  <span class="hw-mock-label">{{ mock_title }}</span>
+                </div>
+              </a>
+              <div class="hw-card-info">
+                {%- if section.settings.show_reviews -%}
+                  <div class="hw-card-rating">
+                    <div class="jdgm-widget jdgm-preview-badge" data-template="index"></div>
+                  </div>
+                {%- endif -%}
+                <a href="/collections/all" class="hw-card-title">{{ mock_title }}</a>
+                <div class="hw-card-pricing">
+                  <span class="hw-price-current">{{ mock_price | money }}</span>
+                  <span class="hw-price-compare">{{ mock_compare | money }}</span>
+                  <span class="hw-price-saving">Save {{ mock_compare | minus: mock_price | money }}</span>
+                </div>
+                {%- if section.settings.show_quick_add -%}
+                  <a href="/collections/all" class="hw-quick-add-btn hw-mock-btn" aria-label="Shop {{ mock_title | escape }}">
+                    <span class="hw-btn-icon">⚡</span>
+                    <span class="hw-btn-text">Shop Deal</span>
+                  </a>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+
+    <!-- Carousel Progress Dots -->
+    <div class="hw-carousel-dots" id="hwDots-{{ section.id }}" aria-hidden="true"></div>
+
+    <!-- Carousel Interactive Logic -->
+    <script>
+      (function() {
+        const sectionId = "{{ section.id }}";
+        const track = document.getElementById('hwTrack-' + sectionId);
+        const prevBtn = document.getElementById('hwPrev-' + sectionId);
+        const nextBtn = document.getElementById('hwNext-' + sectionId);
+        const dotsContainer = document.getElementById('hwDots-' + sectionId);
+        const sectionEl = document.getElementById('hw-deals-' + sectionId);
+
+        if (!track) return;
+
+        const cards = track.querySelectorAll('.hw-carousel-card');
+        if (!cards.length) return;
+
+        // Calculate card step size
+        function getStep() {
+          const firstCard = cards[0];
+          if (!firstCard) return 320;
+          const style = window.getComputedStyle(track);
+          const gap = parseFloat(style.gap) || 20;
+          return firstCard.offsetWidth + gap;
+        }
+
+        // Navigation button listeners
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function() {
+            track.scrollBy({ left: -getStep(), behavior: 'smooth' });
+          });
+        }
+        if (nextBtn) {
+          nextBtn.addEventListener('click', function() {
+            track.scrollBy({ left: getStep(), behavior: 'smooth' });
+          });
+        }
+
+        // Render Pagination Dots
+        function updateDots() {
+          if (!dotsContainer) return;
+          dotsContainer.innerHTML = '';
+          const cardCount = cards.length;
+          const visibleCount = Math.max(1, Math.round(track.clientWidth / getStep()));
+          const dotCount = Math.max(1, cardCount - visibleCount + 1);
+
+          for (let i = 0; i < dotCount; i++) {
+            const dot = document.createElement('button');
+            dot.className = 'hw-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+            dot.addEventListener('click', function() {
+              track.scrollTo({ left: i * getStep(), behavior: 'smooth' });
+            });
+            dotsContainer.appendChild(dot);
+          }
+        }
+        updateDots();
+        window.addEventListener('resize', updateDots, { passive: true });
+
+        // Update active dot and arrow states on scroll
+        function onScroll() {
+          const scrollLeft = track.scrollLeft;
+          const maxScroll = track.scrollWidth - track.clientWidth;
+          const step = getStep();
+          const activeIndex = Math.min(
+            dotsContainer.children.length - 1,
+            Math.max(0, Math.round(scrollLeft / step))
+          );
+
+          if (dotsContainer) {
+            Array.from(dotsContainer.children).forEach(function(dot, idx) {
+              dot.classList.toggle('active', idx === activeIndex);
+            });
+          }
+
+          if (prevBtn) {
+            prevBtn.disabled = scrollLeft <= 4;
+            prevBtn.style.opacity = scrollLeft <= 4 ? '0.45' : '1';
+          }
+          if (nextBtn) {
+            nextBtn.disabled = scrollLeft >= maxScroll - 4;
+            nextBtn.style.opacity = scrollLeft >= maxScroll - 4 ? '0.45' : '1';
+          }
+        }
+        track.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        // Autoplay if enabled
+        const isAutoplay = sectionEl && sectionEl.dataset.autoplay === 'true';
+        const autoplaySpeed = sectionEl ? (parseFloat(sectionEl.dataset.autoplaySpeed) || 4) * 1000 : 4000;
+        let autoplayTimer = null;
+
+        function startAutoplay() {
+          if (!isAutoplay) return;
+          stopAutoplay();
+          autoplayTimer = setInterval(function() {
+            const maxScroll = track.scrollWidth - track.clientWidth;
+            if (track.scrollLeft >= maxScroll - 10) {
+              track.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+              track.scrollBy({ left: getStep(), behavior: 'smooth' });
+            }
+          }, autoplaySpeed);
+        }
+
+        function stopAutoplay() {
+          if (autoplayTimer) {
+            clearInterval(autoplayTimer);
+            autoplayTimer = null;
+          }
+        }
+
+        if (isAutoplay) {
+          startAutoplay();
+          track.addEventListener('mouseenter', stopAutoplay);
+          track.addEventListener('mouseleave', startAutoplay);
+          track.addEventListener('touchstart', stopAutoplay, { passive: true });
+          track.addEventListener('touchend', startAutoplay, { passive: true });
+        }
+
+        // AJAX Quick Add to Cart Handler
+        track.querySelectorAll('.hw-quick-add-btn[data-variant-id]').forEach(function(btn) {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const variantId = btn.getAttribute('data-variant-id');
+            if (!variantId) return;
+
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span>Adding...</span>';
+
+            fetch('/cart/add.js', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                id: variantId,
+                quantity: 1
+              })
+            })
+            .then(function(res) {
+              if (!res.ok) throw new Error('Add to cart failed');
+              return res.json();
+            })
+            .then(function(data) {
+              // 1. Tactile feedback
+              btn.innerHTML = '<span>✓ Added</span>';
+              btn.classList.add('hw-btn-success');
+
+              // 2. Dispatch native Horizon theme events:
+              document.dispatchEvent(new CustomEvent('cart:updated', { detail: { cart: data }, bubbles: true }));
+              document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+              document.dispatchEvent(new CustomEvent('cart:change', { bubbles: true }));
+
+              // 3. Update drawer contents via Section Rendering API
+              fetch((window.Shopify?.routes?.root || '/') + '?section_id=cart-drawer-section')
+                .then(function(r) { return r.text(); })
+                .then(function(html) {
+                  const parser = new DOMParser();
+                  const doc = parser.parseFromString(html, 'text/html');
+                  const newItems = doc.querySelector('.cart-drawer__items, #cart-drawer .cart-drawer__content, cart-drawer-component');
+                  const currentItems = document.querySelector('.cart-drawer__items, #cart-drawer .cart-drawer__content, cart-drawer-component');
+                  if (newItems && currentItems) {
+                    currentItems.innerHTML = newItems.innerHTML;
+                  }
+                })
+                .catch(function(e) { /* ignore silently */ });
+
+              // 4. Open Horizon Cart Drawer:
+              const cartDrawer = document.querySelector('theme-drawer#cart-drawer') || document.querySelector('cart-drawer') || document.querySelector('#cart-drawer') || document.querySelector('.cart-drawer');
+              if (cartDrawer && typeof cartDrawer.open === 'function') {
+                cartDrawer.open();
+              } else if (cartDrawer) {
+                cartDrawer.classList.add('is-open', 'active');
+                cartDrawer.setAttribute('open', '');
+                document.body.classList.add('overflow-hidden');
+              }
+
+              // 5. Fallback: Trigger native drawer open button if exists
+              const drawerTrigger = document.querySelector('[data-cart-drawer-trigger], .header__cart-button, #cart-icon-bubble, [aria-controls="cart-drawer"]');
+              if (drawerTrigger && (!cartDrawer || (!cartDrawer.hasAttribute('open') && !cartDrawer.classList.contains('is-open')))) {
+                drawerTrigger.click();
+              }
+
+              setTimeout(function() {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                btn.classList.remove('hw-btn-success');
+              }, 2000);
+            })
+            .catch(function(error) {
+              console.error('Error adding to cart:', error);
+              btn.innerHTML = '<span>Error</span>';
+              setTimeout(function() {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+              }, 2000);
+            });
+          });
+        });
+      })();
+    </script>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Halloween Deals",
+  "tag": "section",
+  "class": "section-halloween-deals",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Black Friday Flash Deals – VIP Exclusive"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Exclusive limited-time doorbusters on our highest-rated wellness essentials."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 16,
+      "step": 1,
+      "default": 8,
+      "label": "Products to show"
+    },
+    {
+      "type": "header",
+      "content": "Carousel Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_autoplay",
+      "label": "Enable Autoplay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "default": 4,
+      "unit": "s",
+      "label": "Autoplay Speed"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Show Quick Add Button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reviews",
+      "label": "Show Star Ratings",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Halloween Deals Carousel"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,222 @@
+{%- comment -%}
+  Healtence Black Friday / Cyber Monday (BFCM) VIP PDP Deal Card
+  Executive Palette, Live BFCM Countdown, 1-Click Code Copy, Dynamic Net-Price Recalculator
+{%- endcomment -%}
+{%- assign current_time = 'now' | date: '%s' | plus: 0 -%}
+{%- assign end_time = settings.halloween_end_date | default: '2026-11-30T23:59:59' | date: '%s' | plus: 0 -%}
+{%- assign halloween_active = false -%}
+{%- if settings.halloween_enabled and current_time <= end_time -%}
+  {%- assign halloween_active = true -%}
+{%- endif -%}
+
+{%- if halloween_active -%}
+  {%- assign selected_v = product.selected_or_first_available_variant -%}
+  {%- assign net_cents = selected_v.price -%}
+
+  <style>
+    #hwPdpDealCard.hw-pdp-deal-card {
+      background: #FAFDF9 !important;
+      border: 1.5px solid #D1E5D0 !important;
+      border-top: 1.5px solid #D1E5D0 !important;
+      border-radius: 14px !important;
+      padding: 0 !important;
+      margin: 12px 0 18px 0 !important;
+      box-shadow: 0 4px 16px rgba(27, 74, 18, 0.07) !important;
+      overflow: hidden !important;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+    }
+
+    #hwPdpDealCard .hw-pdp-deal-header {
+      background: linear-gradient(90deg, #0D1F12 0%, #1B4A12 100%) !important;
+      color: #FFFFFF !important;
+      margin: 0 !important;
+      padding: 11px 16px !important;
+      border-bottom: 2px solid #F59E0B !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 10px !important;
+    }
+
+    #hwPdpDealCard .hw-pdp-deal-title-wrap {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      min-width: 0 !important;
+    }
+
+    #hwPdpDealCard .hw-pdp-deal-icon {
+      color: #F59E0B !important;
+      font-size: 14px !important;
+      line-height: 1 !important;
+      flex-shrink: 0 !important;
+    }
+
+    #hwPdpDealCard .hw-pdp-deal-title {
+      color: #FFFFFF !important;
+      font-size: 0.82rem !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.05em !important;
+      line-height: 1.2 !important;
+    }
+
+    #hwPdpDealCard .hw-pdp-deal-badge {
+      background: #F59E0B !important;
+      color: #0D1F12 !important;
+      font-size: 0.72rem !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.04em !important;
+      padding: 4px 10px !important;
+      border-radius: 9999px !important;
+      white-space: nowrap !important;
+      box-shadow: none !important;
+      flex-shrink: 0 !important;
+    }
+
+    #hwPdpDealCard .hw-pdp-deal-body {
+      padding: 12px 14px 13px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 9px !important;
+    }
+
+    #hwPdpDealCard .bfcm-vip-unlock-bar {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 8px !important;
+      background: #FFFFFF !important;
+      border: 1px solid #E2EADF !important;
+      border-radius: 10px !important;
+      padding: 9px 12px !important;
+      margin: 0 !important;
+    }
+
+    #hwPdpDealCard .bfcm-unlock-text {
+      font-size: 0.8rem !important;
+      font-weight: 600 !important;
+      color: #111827 !important;
+      line-height: 1.3 !important;
+    }
+
+    #hwPdpDealCard .bfcm-dynamic-net-price-row {
+      background: #F4F7F4 !important;
+      border: none !important;
+      border-left: 3.5px solid #F59E0B !important;
+      border-radius: 8px !important;
+      padding: 9px 12px !important;
+      margin: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 8px !important;
+    }
+
+    #hwPdpDealCard .bfcm-net-price-left {
+      display: inline-flex !important;
+      align-items: baseline !important;
+      gap: 6px !important;
+      flex-wrap: wrap !important;
+    }
+
+    #hwPdpDealCard .bfcm-net-price-label {
+      font-size: 0.82rem !important;
+      font-weight: 600 !important;
+      color: #1E293B !important;
+    }
+
+    #hwPdpDealCard .bfcm-net-price {
+      font-size: 1.05rem !important;
+      font-weight: 800 !important;
+      color: #1B4A12 !important;
+      letter-spacing: -0.01em !important;
+    }
+
+    #hwPdpDealCard .bfcm-auto-discount-badge {
+      font-size: 0.72rem !important;
+      font-weight: 700 !important;
+      color: #1B4A12 !important;
+      background: transparent !important;
+      border: none !important;
+      letter-spacing: 0.04em !important;
+      padding: 0 !important;
+      white-space: nowrap !important;
+    }
+
+    #hwPdpDealCard .hw-pdp-deal-footer {
+      padding: 3px 2px 0 !important;
+      margin: 0 !important;
+    }
+
+    #hwPdpDealCard .hw-pdp-guarantee-note {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      gap: 4px 12px !important;
+      font-family: inherit !important;
+      font-size: 0.74rem !important;
+      font-weight: 500 !important;
+      color: #374151 !important;
+      line-height: 1.4 !important;
+    }
+
+    #hwPdpDealCard .hw-pdp-trust-item {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      white-space: nowrap !important;
+    }
+
+    #hwPdpDealCard .hw-pdp-trust-check {
+      color: #1B4A12 !important;
+      font-weight: 700 !important;
+    }
+  </style>
+
+  <div 
+    class="hw-pdp-deal-card bfcm-pdp-deal-card" 
+    id="hwPdpDealCard" 
+    role="region" 
+    aria-label="Black Friday VIP Deal Details"
+    data-agent-landmark="bfcm-offer"
+  >
+    <!-- Header Row -->
+    <div class="hw-pdp-deal-header bfcm-deal-header">
+      <div class="hw-pdp-deal-title-wrap">
+        <span class="hw-pdp-deal-icon" aria-hidden="true">✦</span>
+        <span class="hw-pdp-deal-title">BLACK FRIDAY STOREWIDE EVENT</span>
+      </div>
+      <div class="hw-pdp-deal-badge bfcm-gold-badge">
+        <span>UP TO 70% OFF</span>
+      </div>
+    </div>
+
+    <div class="hw-pdp-deal-body">
+      <!-- VIP Price & Email Unlock Bar -->
+      <div class="bfcm-vip-unlock-bar">
+        <div class="bfcm-unlock-left">
+          <span class="bfcm-unlock-dot" aria-hidden="true">✦</span>
+          <span class="bfcm-unlock-text">Black Friday Storewide Discount Auto-Applied</span>
+        </div>
+      </div>
+
+      <!-- Dynamic Storewide VIP Net Price Display -->
+      <div class="bfcm-dynamic-net-price-row" id="bfcmCouponNetPrice">
+        <div class="bfcm-net-price-left">
+          <span class="bfcm-net-price-label">Black Friday VIP Price:</span>
+          <strong class="bfcm-net-price">{{ net_cents | money }}</strong>
+        </div>
+        <span class="bfcm-auto-discount-badge">AUTO-APPLIED</span>
+      </div>
+
+      <!-- Trust Footer -->
+      <div class="hw-pdp-deal-footer bfcm-deal-footer">
+        <div class="hw-pdp-guarantee-note">
+          <span class="hw-pdp-trust-item"><span class="hw-pdp-trust-check" aria-hidden="true">✓</span> Free US shipping on orders over $50</span>
+          <span class="hw-pdp-trust-item"><span class="hw-pdp-trust-check" aria-hidden="true">✓</span> Ships in 1&ndash;2 business days</span>
+          <span class="hw-pdp-trust-item"><span class="hw-pdp-trust-check" aria-hidden="true">✓</span> 30-Day Money-Back Guarantee</span>
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endif -%}

@@ -1,0 +1,66 @@
+{%- comment -%}
+  Healtence Black Friday Restock Waitlist Card
+  Smoothly revealed when an out-of-stock variant is selected.
+  Captures VIP customer demand with automated variant attribution.
+{%- endcomment -%}
+
+{%- assign first_v = product.selected_or_first_available_variant -%}
+{%- assign is_currently_soldout = false -%}
+{%- if first_v.available == false -%}
+  {%- assign is_currently_soldout = true -%}
+{%- endif -%}
+
+<div 
+  class="bfcm-waitlist-card" 
+  id="bfcmWaitlistCard" 
+  role="region" 
+  aria-label="Restock Notification Form"
+  data-agent-action="join-restock-waitlist"
+  style="{% unless is_currently_soldout %}display: none;{% endunless %}"
+>
+  <div class="bfcm-waitlist-header">
+    <div class="bfcm-waitlist-headline">
+      <span class="bfcm-soldout-dot" aria-hidden="true">🔴</span>
+      <strong>Currently out of stock: <span class="bfcm-waitlist-variant-name">{{ first_v.title | default: 'Selected Variant' }}</span></strong>
+    </div>
+    <p class="bfcm-waitlist-subtext">
+      Enter your email below to get notified when this item is back in stock.
+    </p>
+  </div>
+
+  <form id="bfcmWaitlistForm" class="bfcm-waitlist-form" method="post" action="/contact#contact_form" accept-charset="UTF-8" aria-label="Join restock waitlist" data-tool-name="join-restock-waitlist">
+    <input type="hidden" name="form_type" value="customer">
+    <input type="hidden" name="utf8" value="✓">
+    <input type="hidden" name="contact[tags]" value="bfcm-restock-waitlist">
+    <input type="hidden" name="contact[product_title]" value="{{ product.title | escape }}">
+    <input type="hidden" name="contact[variant_id]" value="{{ first_v.id }}">
+    <input type="hidden" name="contact[body]" value="VIP Black Friday Restock Request: {{ product.title | escape }} - {{ first_v.title | escape }} (ID: {{ first_v.id }})">
+
+    <div class="bfcm-waitlist-input-group">
+      <input 
+        type="email" 
+        name="contact[email]" 
+        class="bfcm-waitlist-input" 
+        placeholder="Enter your email address..." 
+        required 
+        aria-label="Email address for restock alert"
+        autocomplete="email"
+      >
+      <button 
+        type="submit" 
+        class="bfcm-waitlist-submit-btn" 
+        data-agent-action="submit-waitlist"
+        aria-label="Join Black Friday VIP Waitlist"
+      >
+        <span>🔔 Join Waitlist</span>
+      </button>
+    </div>
+  </form>
+
+  <div class="bfcm-waitlist-success" style="display: none;" role="status">
+    <div class="bfcm-success-pill">
+      <span>✓ You're on the restock waitlist! We'll email you the moment this variant is back in stock.</span>
+    </div>
+  </div>
+</div>
+

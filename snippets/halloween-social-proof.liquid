@@ -1,0 +1,10 @@
+{%- comment -%}
+  Social Proof Toast
+  Compliance: Kept disabled by default. No synthetic urgency or fabricated purchase notifications.
+{%- endcomment -%}
+{%- assign enable_social_proof = false -%}
+{%- if enable_social_proof -%}
+  <div class="hw-social-proof-toast" style="display: none;" aria-live="polite">
+    <!-- Reserved for authenticated customer order stream -->
+  </div>
+{%- endif -%}

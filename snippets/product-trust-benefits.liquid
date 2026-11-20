@@ -1,0 +1,452 @@
+{% assign ht_variant = product.selected_or_first_available_variant %}
+
+<div class="ht-trust-block">
+  <div class="ht-trust-grid">
+
+    <!-- FREE SHIPPING -->
+    <a
+      href="{% if shop.shipping_policy != blank %}{{ shop.shipping_policy.url }}{% else %}/policies/shipping-policy{% endif %}"
+      class="ht-trust-card"
+    >
+      <div class="ht-trust-icon">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M5 16H40V45H5V16Z"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M40 27H50L59 36V45H40V27Z"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linejoin="round"
+          />
+          <circle
+            cx="17"
+            cy="49"
+            r="5"
+            stroke="currentColor"
+            stroke-width="2.8"
+          />
+          <circle
+            cx="49"
+            cy="49"
+            r="5"
+            stroke="currentColor"
+            stroke-width="2.8"
+          />
+          <path
+            d="M40 36H59"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+
+      <div class="ht-trust-title">
+        Free Shipping
+      </div>
+    </a>
+
+
+    <!-- SECURE CHECKOUT -->
+    {% if ht_variant != blank and ht_variant.available %}
+
+      <form
+        method="post"
+        action="{{ routes.cart_add_url }}"
+        class="ht-trust-card ht-trust-checkout"
+      >
+        <input
+          type="hidden"
+          name="id"
+          value="{{ ht_variant.id }}"
+        >
+
+        <input
+          type="hidden"
+          name="quantity"
+          value="1"
+        >
+
+        <input
+          type="hidden"
+          name="return_to"
+          value="/checkout"
+        >
+
+        <button
+          type="submit"
+          class="ht-trust-checkout-button"
+        >
+          <div class="ht-trust-icon">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect
+                x="15"
+                y="27"
+                width="34"
+                height="28"
+                rx="4"
+                stroke="currentColor"
+                stroke-width="2.8"
+              />
+              <path
+                d="M23 27V20C23 14 27 9 32 9C37 9 41 14 41 20V27"
+                stroke="currentColor"
+                stroke-width="2.8"
+                stroke-linecap="round"
+              />
+              <path
+                d="M27 41L32 46L41 36"
+                stroke="currentColor"
+                stroke-width="2.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+
+          <div class="ht-trust-title">
+            Secure Checkout
+          </div>
+        </button>
+      </form>
+
+    {% else %}
+
+      <div class="ht-trust-card ht-trust-disabled">
+        <div class="ht-trust-icon">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect
+              x="15"
+              y="27"
+              width="34"
+              height="28"
+              rx="4"
+              stroke="currentColor"
+              stroke-width="2.8"
+            />
+            <path
+              d="M23 27V20C23 14 27 9 32 9C37 9 41 14 41 20V27"
+              stroke="currentColor"
+              stroke-width="2.8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+
+        <div class="ht-trust-title">
+          Secure Checkout
+        </div>
+      </div>
+
+    {% endif %}
+
+
+    <!-- MONEY BACK GUARANTEE -->
+    <a
+      href="{% if shop.refund_policy != blank %}{{ shop.refund_policy.url }}{% else %}/policies/refund-policy{% endif %}"
+      class="ht-trust-card"
+    >
+      <div class="ht-trust-icon">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M48 17C43 12 37 10 32 10C22 10 14 15 10 23"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linecap="round"
+          />
+          <path
+            d="M10 23V13"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linecap="round"
+          />
+          <path
+            d="M10 23H20"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linecap="round"
+          />
+          <path
+            d="M16 47C21 52 27 54 32 54C42 54 50 49 54 41"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linecap="round"
+          />
+          <path
+            d="M54 41V51"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linecap="round"
+          />
+          <path
+            d="M54 41H44"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linecap="round"
+          />
+          <circle
+            cx="32"
+            cy="32"
+            r="10"
+            stroke="currentColor"
+            stroke-width="2.8"
+          />
+          <path
+            d="M32 25V39"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linecap="round"
+          />
+          <path
+            d="M36 28C35 26 32 25 30 26C27 27 27 30 30 31L34 33C37 34 37 37 34 38C31 39 28 38 27 36"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+
+      <div class="ht-trust-title">
+        30 Day Money Back Guarantee
+      </div>
+    </a>
+
+  </div>
+</div>
+
+
+<style>
+  /* =========================================
+     TRUST BENEFITS
+     ========================================= */
+
+  .ht-trust-block {
+    width: 100%;
+    margin: 14px 0;
+  }
+
+  .ht-trust-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+  }
+
+
+  /* =========================================
+     CARD
+     ========================================= */
+
+  .ht-trust-card {
+    min-height: 138px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 18px 12px;
+
+    box-sizing: border-box;
+
+    background: #dcebdc;
+
+    border: 0;
+    border-radius: 18px;
+
+    color: #111111;
+    text-decoration: none;
+
+    text-align: center;
+
+    cursor: pointer;
+
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .ht-trust-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.08);
+  }
+
+
+  /* =========================================
+     ICON
+     ========================================= */
+
+  .ht-trust-icon {
+    width: 54px;
+    height: 54px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 10px;
+
+    color: #111111;
+  }
+
+  .ht-trust-icon svg {
+    width: 52px;
+    height: 52px;
+
+    display: block;
+  }
+
+
+  /* =========================================
+     TITLE
+     ========================================= */
+
+  .ht-trust-title {
+    max-width: 150px;
+
+    color: #111111;
+
+    font-size: 16px;
+    line-height: 1.2;
+
+    font-weight: 700;
+
+    text-align: center;
+  }
+
+
+  /* =========================================
+     CHECKOUT
+     ========================================= */
+
+  .ht-trust-checkout {
+    padding: 0;
+  }
+
+  .ht-trust-checkout-button {
+    width: 100%;
+    min-height: 138px;
+
+    padding: 18px 12px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    background: transparent;
+
+    color: inherit;
+
+    font: inherit;
+
+    text-align: center;
+
+    cursor: pointer;
+  }
+
+  .ht-trust-checkout-button .ht-trust-icon {
+    margin-bottom: 10px;
+  }
+
+  .ht-trust-checkout-button:hover {
+    background: transparent;
+  }
+
+  .ht-trust-checkout-button:focus-visible {
+    outline: 2px solid #111111;
+    outline-offset: -3px;
+    border-radius: 18px;
+  }
+
+
+  /* =========================================
+     DISABLED
+     ========================================= */
+
+  .ht-trust-disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  .ht-trust-disabled:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+
+  /* =========================================
+     TABLET
+     ========================================= */
+
+  @media screen and (max-width: 989px) {
+
+    .ht-trust-grid {
+      gap: 8px;
+    }
+
+    .ht-trust-card {
+      min-height: 130px;
+    }
+
+    .ht-trust-checkout-button {
+      min-height: 130px;
+    }
+
+    .ht-trust-title {
+      font-size: 15px;
+    }
+  }
+
+
+  /* =========================================
+     MOBILE
+     ========================================= */
+
+  @media screen and (max-width: 749px) {
+
+    .ht-trust-block {
+      margin: 10px 0;
+    }
+
+    .ht-trust-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .ht-trust-card {
+      min-height: 112px;
+      padding: 14px 8px;
+
+      border-radius: 16px;
+    }
+
+    .ht-trust-checkout-button {
+      min-height: 112px;
+      padding: 14px 8px;
+    }
+
+    .ht-trust-icon {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 7px;
+    }
+
+    .ht-trust-icon svg {
+      width: 42px;
+      height: 42px;
+    }
+
+    .ht-trust-title {
+      max-width: 100%;
+
+      font-size: 13px;
+      line-height: 1.2;
+    }
+  }
+</style>

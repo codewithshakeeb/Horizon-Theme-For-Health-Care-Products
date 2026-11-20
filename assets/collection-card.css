@@ -1,0 +1,325 @@
+/* ==========================================================================
+     LUXURY MEDICAL-GRADE WELLNESS COLLECTION CARD ARCHITECTURE
+     ========================================================================== */
+  .bfcm-luxury-collection-card.collection-card {
+    background: #FFFFFF !important;
+    border-radius: 18px !important;
+    border: 1.5px solid #E2E8F0 !important;
+    padding: 12px 12px 14px 12px !important;
+    box-shadow: 0 4px 16px rgba(13, 31, 18, 0.04) !important;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    height: 100% !important;
+    cursor: pointer !important;
+  }
+
+  .bfcm-luxury-collection-card.collection-card:hover {
+    transform: translateY(-4px) !important;
+    border-color: #1B4A12 !important;
+    box-shadow: 0 16px 32px rgba(27, 74, 18, 0.12), 0 0 0 1px #1B4A12 !important;
+  }
+
+  .bfcm-luxury-collection-card .collection-card__inner {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+    pointer-events: none !important;
+    gap: 0 !important;
+  }
+
+  .bfcm-luxury-collection-card .collection-card__link {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 5 !important;
+    border-radius: 18px !important;
+  }
+
+  /* 1. Dedicated Image Stage Well (Full-bleed container fitting) */
+  .bfcm-luxury-collection-card .bfcm-card-stage {
+    position: relative !important;
+    width: 100% !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    background: #F1F5F0 !important;
+    border: 1px solid rgba(27, 74, 18, 0.08) !important;
+    aspect-ratio: 1 / 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    transition: background 0.3s ease !important;
+  }
+
+  .bfcm-luxury-collection-card:hover .bfcm-card-stage {
+    background: #E5EFE4 !important;
+  }
+
+  /* Top-Left Floating Tag Pill */
+  .bfcm-luxury-collection-card .bfcm-card-tag-pill {
+    position: absolute !important;
+    top: 10px !important;
+    left: 10px !important;
+    z-index: 4 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    color: #1B4A12 !important;
+    border: 1px solid rgba(27, 74, 18, 0.2) !important;
+    border-radius: 9999px !important;
+    padding: 3.5px 8.5px !important;
+    font-size: 9.5px !important;
+    font-weight: 750 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    line-height: 1.1 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+    white-space: nowrap !important;
+    pointer-events: none !important;
+  }
+
+  /* Top-Right Circular Action Arrow */
+  .bfcm-luxury-collection-card .bfcm-card-circle-arrow {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    z-index: 4 !important;
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    border: 1px solid #E2E8F0 !important;
+    color: #1B4A12 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    pointer-events: none !important;
+  }
+
+  .bfcm-luxury-collection-card:hover .bfcm-card-circle-arrow {
+    background: #1B4A12 !important;
+    border-color: #1B4A12 !important;
+    color: #FFFFFF !important;
+    transform: scale(1.08) !important;
+    box-shadow: 0 4px 10px rgba(27, 74, 18, 0.3) !important;
+  }
+
+  .bfcm-luxury-collection-card:hover .bfcm-card-circle-arrow svg {
+    stroke: #FFFFFF !important;
+    transform: translateX(1px) !important;
+  }
+
+  /* Full-Bleed Product Image Fitting Container 100% */
+  .bfcm-luxury-collection-card .bfcm-card-img-holder,
+  .bfcm-luxury-collection-card .collection-card__image,
+  .bfcm-luxury-collection-card .resource-image,
+  .bfcm-luxury-collection-card picture {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    position: relative !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .bfcm-luxury-collection-card .bfcm-card-img-holder img,
+  .bfcm-luxury-collection-card .collection-card__image img,
+  .bfcm-luxury-collection-card .resource-image img,
+  .bfcm-luxury-collection-card .resource-image__image,
+  .bfcm-luxury-collection-card img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    mix-blend-mode: normal !important;
+    filter: none !important;
+    border-radius: 14px !important;
+    display: block !important;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .bfcm-luxury-collection-card:hover .bfcm-card-img-holder img,
+  .bfcm-luxury-collection-card:hover .collection-card__image img,
+  .bfcm-luxury-collection-card:hover .resource-image img,
+  .bfcm-luxury-collection-card:hover .resource-image__image,
+  .bfcm-luxury-collection-card:hover img {
+    transform: scale(1.06) !important;
+  }
+
+  /* 2. Card Content Body */
+  .bfcm-luxury-collection-card .bfcm-card-body {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    flex: 1 1 auto !important;
+    padding-top: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .bfcm-luxury-collection-card .bfcm-card-heading {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+    font-size: 14.5px !important;
+    font-weight: 750 !important;
+    color: #0D1F12 !important;
+    line-height: 1.25 !important;
+    margin: 0 0 3px 0 !important;
+    padding: 0 !important;
+    letter-spacing: -0.015em !important;
+    transition: color 0.2s ease !important;
+  }
+
+  .bfcm-luxury-collection-card:hover .bfcm-card-heading {
+    color: #1B4A12 !important;
+  }
+
+  .bfcm-luxury-collection-card .bfcm-card-description {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+    font-size: 11.5px !important;
+    color: #64748B !important;
+    line-height: 1.35 !important;
+    margin: 0 0 8px 0 !important;
+    padding: 0 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    min-height: 31px !important;
+  }
+
+  /* Card Bottom Bar (Solution Badge + CTA) */
+  .bfcm-luxury-collection-card .bfcm-card-bottom-bar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding-top: 6px !important;
+    border-top: 1px solid #F1F5F9 !important;
+    margin-top: auto !important;
+  }
+
+  .bfcm-luxury-collection-card .bfcm-solution-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    background: #EDF7EE !important;
+    color: #1B4A12 !important;
+    border-radius: 9999px !important;
+    padding: 2.5px 8px !important;
+    font-size: 10.5px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em !important;
+  }
+
+  .bfcm-luxury-collection-card .bfcm-badge-dot {
+    width: 5px !important;
+    height: 5px !important;
+    border-radius: 50% !important;
+    background: #1B4A12 !important;
+    display: inline-block !important;
+  }
+
+  .bfcm-luxury-collection-card .bfcm-shop-cta {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+    font-size: 11.5px !important;
+    font-weight: 750 !important;
+    color: #1B4A12 !important;
+    transition: transform 0.2s ease, color 0.2s ease !important;
+  }
+
+  .bfcm-luxury-collection-card:hover .bfcm-shop-cta {
+    transform: translateX(2px) !important;
+    color: #14370D !important;
+  }
+
+  /* ==========================================================================
+     RESPONSIVE GRID SYSTEM (5-Col Desktop, 2-Col Mobile + Spotlight 5th Card)
+     ========================================================================== */
+  @media screen and (min-width: 990px) {
+    .section-resource-list[data-testid="collection-list"] .resource-list,
+    .ui-test-collection-list .resource-list,
+    [id*="collection_list"] .resource-list {
+      display: grid !important;
+      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+      gap: 16px !important;
+      width: 100% !important;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .section-resource-list[data-testid="collection-list"] .resource-list,
+    .ui-test-collection-list .resource-list,
+    [id*="collection_list"] .resource-list {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 10px !important;
+      width: 100% !important;
+    }
+
+    /* 5th Card: Horizontal Spotlight spanning full width to perfectly balance the 2-col layout */
+    .section-resource-list[data-testid="collection-list"] .resource-list .resource-list__item:nth-child(5),
+    .ui-test-collection-list .resource-list .resource-list__item:nth-child(5),
+    [id*="collection_list"] .resource-list .resource-list__item:nth-child(5) {
+      grid-column: 1 / -1 !important;
+    }
+
+    .section-resource-list[data-testid="collection-list"] .resource-list .resource-list__item:nth-child(5) .bfcm-luxury-collection-card .collection-card__inner,
+    .ui-test-collection-list .resource-list .resource-list__item:nth-child(5) .bfcm-luxury-collection-card .collection-card__inner,
+    [id*="collection_list"] .resource-list .resource-list__item:nth-child(5) .bfcm-luxury-collection-card .collection-card__inner {
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 14px !important;
+    }
+
+    .section-resource-list[data-testid="collection-list"] .resource-list .resource-list__item:nth-child(5) .bfcm-card-stage,
+    .ui-test-collection-list .resource-list .resource-list__item:nth-child(5) .bfcm-card-stage,
+    [id*="collection_list"] .resource-list .resource-list__item:nth-child(5) .bfcm-card-stage {
+      width: 88px !important;
+      min-width: 88px !important;
+      max-width: 88px !important;
+      height: 88px !important;
+      flex-shrink: 0 !important;
+      border-radius: 12px !important;
+    }
+
+    .section-resource-list[data-testid="collection-list"] .resource-list .resource-list__item:nth-child(5) .bfcm-card-circle-arrow,
+    .ui-test-collection-list .resource-list .resource-list__item:nth-child(5) .bfcm-card-circle-arrow,
+    [id*="collection_list"] .resource-list .resource-list__item:nth-child(5) .bfcm-card-circle-arrow {
+      display: none !important;
+    }
+
+    .section-resource-list[data-testid="collection-list"] .resource-list .resource-list__item:nth-child(5) .bfcm-card-body,
+    .ui-test-collection-list .resource-list .resource-list__item:nth-child(5) .bfcm-card-body,
+    [id*="collection_list"] .resource-list .resource-list__item:nth-child(5) .bfcm-card-body {
+      padding-top: 0 !important;
+      min-width: 0 !important;
+    }
+
+    .section-resource-list[data-testid="collection-list"] .resource-list .resource-list__item:nth-child(5) .bfcm-card-description,
+    .ui-test-collection-list .resource-list .resource-list__item:nth-child(5) .bfcm-card-description,
+    [id*="collection_list"] .resource-list .resource-list__item:nth-child(5) .bfcm-card-description {
+      min-height: unset !important;
+      -webkit-line-clamp: 1 !important;
+      margin-bottom: 6px !important;
+    }
+  }

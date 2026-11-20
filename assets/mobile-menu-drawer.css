@@ -1,0 +1,304 @@
+/* Mobile Menu Drawer Complete Redesign - Ultra-clean DTC Typography & Layout */
+        .menu-drawer {
+          background: #FFFFFF !important;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+          z-index: 999999 !important;
+        }
+
+        .hw-drawer-header {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+          padding: 14px 20px !important;
+          background: #FFFFFF !important;
+          border-bottom: 1px solid #F1F5F9 !important;
+        }
+
+        .hw-drawer-brand {
+          display: inline-flex !important;
+          align-items: center !important;
+          gap: 6px !important;
+          text-decoration: none !important;
+        }
+
+        .hw-drawer-brand-name {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+          font-size: 16px !important;
+          font-weight: 800 !important;
+          letter-spacing: 0.06em !important;
+          color: #0D1F12 !important;
+        }
+
+        .hw-drawer-brand-dot {
+          width: 6px !important;
+          height: 6px !important;
+          border-radius: 50% !important;
+          background: #1B4A12 !important;
+        }
+
+        .hw-drawer-close-btn {
+          width: 34px !important;
+          height: 34px !important;
+          min-width: 34px !important;
+          min-height: 34px !important;
+          border-radius: 50% !important;
+          background: #F8FAFC !important;
+          border: 1px solid #E2E8F0 !important;
+          color: #1E293B !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          cursor: pointer !important;
+          padding: 0 !important;
+        }
+
+        .hw-drawer-promo-strip {
+          background: #14370D !important;
+          padding: 8px 16px !important;
+          text-align: center !important;
+        }
+
+        .hw-drawer-promo-inner {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 6px !important;
+          color: #FFFFFF !important;
+          font-size: 11.5px !important;
+          letter-spacing: 0.04em !important;
+        }
+
+        .hw-drawer-promo-icon {
+          color: #F59E0B !important;
+          font-size: 12px !important;
+        }
+
+        .menu-drawer__navigation {
+          padding: 6px 0 !important;
+        }
+
+        .menu-drawer__menu {
+          list-style: none !important;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+
+        .menu-drawer__list-item,
+        .menu-drawer__list-item--divider,
+        .menu-drawer__list-item--deep,
+        .menu-drawer__list-item--flat {
+          border-bottom: 1px solid #F1F5F9 !important;
+          border-top: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+
+        .menu-drawer__menu-item,
+        .menu-drawer__menu-item--mainlist,
+        .menu-drawer__menu-item--parent,
+        .menu-drawer__menu-item--child {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+          padding: 13px 20px !important;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+          font-size: 15px !important;
+          font-weight: 600 !important;
+          color: #0D1F12 !important;
+          text-decoration: none !important;
+          line-height: 1.35 !important;
+          transition: background 0.15s ease, color 0.15s ease !important;
+        }
+
+        .menu-drawer__menu-item:hover,
+        .menu-drawer__menu-item--mainlist:hover {
+          background: #F8FAF9 !important;
+          color: #1B4A12 !important;
+        }
+
+        .menu-drawer__menu-item-text {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+          font-size: 15px !important;
+          font-weight: 600 !important;
+          color: inherit !important;
+          text-decoration: none !important;
+        }
+
+        .menu-drawer__menu-item svg,
+        .menu-drawer__menu-item .icon-plus svg,
+        .menu-drawer__menu-item .icon-caret svg {
+          width: 14px !important;
+          height: 14px !important;
+          color: #64748B !important;
+          stroke: #64748B !important;
+        }
+
+        /* Currency / Localization Selector */
+        .menu-drawer__utility-links {
+          padding: 12px 20px !important;
+          border-bottom: 1px solid #F1F5F9 !important;
+        }
+
+        .drawer-localization__button {
+          padding: 0 !important;
+          border: none !important;
+          background: transparent !important;
+        }
+
+        .drawer-localization__button--label {
+          display: inline-flex !important;
+          align-items: center !important;
+          gap: 6px !important;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+          font-size: 12.5px !important;
+          font-weight: 600 !important;
+          color: #334155 !important;
+          background: #F8FAFC !important;
+          border: 1px solid #E2E8F0 !important;
+          border-radius: 8px !important;
+          padding: 6px 14px !important;
+        }
+
+        /* Trending Deals Carousel in Drawer */
+        .menu-drawer__featured-content {
+          padding: 16px 20px !important;
+          background: #FAFCF9 !important;
+          border-bottom: 1px solid #EDF2EB !important;
+        }
+
+        .hw-drawer-featured-header {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+          margin-bottom: 12px !important;
+        }
+
+        .hw-drawer-featured-title {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+          font-size: 11.5px !important;
+          font-weight: 700 !important;
+          color: #0D1F12 !important;
+          letter-spacing: 0.06em !important;
+          text-transform: uppercase !important;
+        }
+
+        .hw-drawer-featured-viewall {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+          font-size: 12px !important;
+          font-weight: 600 !important;
+          color: #1B4A12 !important;
+          text-decoration: none !important;
+        }
+
+        .menu-drawer__featured-content-list {
+          display: flex !important;
+          gap: 12px !important;
+          overflow-x: auto !important;
+          padding: 4px 0 10px 0 !important;
+          margin: 0 !important;
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+
+        .menu-drawer__featured-content-list::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+
+        .menu-drawer__featured-content-list-item {
+          flex: 0 0 140px !important;
+          min-width: 140px !important;
+        }
+
+        /* Drawer Trust Row & Utility Links (Fix icon + text stacking) */
+        .hw-drawer-footer {
+          padding: 18px 20px 28px 20px !important;
+          background: #FFFFFF !important;
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 12px !important;
+          margin-top: auto !important;
+        }
+
+        .hw-drawer-trust-row {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 9px !important;
+          padding: 12px 14px !important;
+          background: #F8FAF9 !important;
+          border-radius: 10px !important;
+          border: 1px solid #EDF2EB !important;
+        }
+
+        .hw-drawer-trust-item {
+          display: flex !important;
+          flex-direction: row !important;
+          align-items: center !important;
+          gap: 10px !important;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+          font-size: 12.5px !important;
+          font-weight: 600 !important;
+          color: #334155 !important;
+          line-height: 1.3 !important;
+        }
+
+        .hw-drawer-trust-item svg {
+          width: 16px !important;
+          height: 16px !important;
+          min-width: 16px !important;
+          color: #1B4A12 !important;
+          stroke: #1B4A12 !important;
+          flex-shrink: 0 !important;
+          display: block !important;
+        }
+
+        .hw-drawer-utility-links {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 8px !important;
+        }
+
+        .hw-drawer-util-btn {
+          display: flex !important;
+          flex-direction: row !important;
+          align-items: center !important;
+          gap: 10px !important;
+          padding: 10px 14px !important;
+          border: 1px solid #E2E8F0 !important;
+          border-radius: 8px !important;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+          font-size: 13px !important;
+          font-weight: 600 !important;
+          color: #1E293B !important;
+          text-decoration: none !important;
+          background: #FFFFFF !important;
+          transition: background 0.15s ease, border-color 0.15s ease !important;
+        }
+
+        .hw-drawer-util-btn:hover {
+          background: #F8FAF9 !important;
+          border-color: #1B4A12 !important;
+          color: #1B4A12 !important;
+        }
+
+        .hw-drawer-util-btn svg {
+          width: 15px !important;
+          height: 15px !important;
+          min-width: 15px !important;
+          color: #1B4A12 !important;
+          stroke: #1B4A12 !important;
+          flex-shrink: 0 !important;
+          display: block !important;
+        }
+
+        /* Suppress Bottom Floating Sticky Bars while Menu Drawer is Open */
+        details#Details-menu-drawer-container[open] ~ * .hw-mobile-sticky-bar,
+        details#Details-menu-drawer-container[open] ~ .hw-mobile-sticky-bar,
+        body:has(details#Details-menu-drawer-container[open]) .hw-mobile-sticky-bar,
+        body.mobile-menu-is-open .hw-mobile-sticky-bar {
+          display: none !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+          visibility: hidden !important;
+        }

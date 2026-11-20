@@ -1,0 +1,123 @@
+{%- assign current_time = 'now' | date: '%s' | plus: 0 -%}
+{%- assign end_time = settings.halloween_end_date | default: '2026-11-30T23:59:59' | date: '%s' | plus: 0 -%}
+{%- assign halloween_active = false -%}
+{%- if settings.halloween_enabled and current_time <= end_time -%}
+  {%- assign halloween_active = true -%}
+{%- endif -%}
+
+{%- if halloween_active -%}
+  <nav class="hw-col-quick-filters page-width bfcm-quick-filters" aria-label="Black Friday Quick Category Filters">
+    <div class="hw-filters-scroll-container">
+      <div class="hw-filters-list">
+        <span class="hw-filters-label">
+          <span aria-hidden="true">⚡</span>
+          <span>Quick Filters:</span>
+        </span>
+
+        <!-- Chip 1: All Deals -->
+        <a 
+          href="{{ collection.url | default: '/collections/all' }}" 
+          class="hw-filter-chip active"
+          data-filter="all"
+        >
+          <span>All VIP Deals</span>
+        </a>
+
+        <!-- Chip 2: Under $30 -->
+        <a 
+          href="{{ collection.url | default: '/collections/all' }}?filter.v.price.lte=30" 
+          class="hw-filter-chip"
+          data-filter="under-30"
+        >
+          <span class="hw-chip-icon" aria-hidden="true">⚡</span>
+          <span>Under $30</span>
+        </a>
+
+        <!-- Chip 3: Best Sellers -->
+        <a 
+          href="{{ collection.url | default: '/collections/all' }}?sort_by=best-selling" 
+          class="hw-filter-chip"
+          data-filter="best-selling"
+        >
+          <span class="hw-chip-icon" aria-hidden="true">🔥</span>
+          <span>Best Sellers</span>
+        </a>
+
+        <!-- Chip 4: Joint & Muscle -->
+        <a 
+          href="/collections/joint-muscle-care" 
+          class="hw-filter-chip"
+          data-filter="joint-muscle"
+        >
+          <span class="hw-chip-icon" aria-hidden="true">🌿</span>
+          <span>Joint & Muscle</span>
+        </a>
+
+        <!-- Chip 5: Sleep & Relaxation -->
+        <a 
+          href="/collections/comfort-relaxation" 
+          class="hw-filter-chip"
+          data-filter="relaxation"
+        >
+          <span class="hw-chip-icon" aria-hidden="true">🌙</span>
+          <span>Sleep & Relaxation</span>
+        </a>
+
+        <!-- Chip 6: Top Rated -->
+        <a 
+          href="{{ collection.url | default: '/collections/all' }}?sort_by=manual" 
+          class="hw-filter-chip"
+          data-filter="top-rated"
+        >
+          <span class="hw-chip-icon" aria-hidden="true">⭐</span>
+          <span>Top Rated (5★)</span>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      (function() {
+        // Highlight active filter chip based on URL parameters or pathname
+        const urlParams = new URLSearchParams(window.location.search);
+        const path = window.location.pathname;
+        const chips = document.querySelectorAll('.hw-filter-chip');
+
+        chips.forEach(function(chip) {
+          chip.classList.remove('active');
+          const filterType = chip.getAttribute('data-filter');
+
+          if (filterType === 'under-30' && urlParams.get('filter.v.price.lte') === '30') {
+            chip.classList.add('active');
+          } else if (filterType === 'best-selling' && urlParams.get('sort_by') === 'best-selling') {
+            chip.classList.add('active');
+          } else if (filterType === 'joint-muscle' && path.includes('joint-muscle-care')) {
+            chip.classList.add('active');
+          } else if (filterType === 'relaxation' && path.includes('comfort-relaxation')) {
+            chip.classList.add('active');
+          } else if (filterType === 'all' && !urlParams.get('filter.v.price.lte') && !urlParams.get('sort_by')) {
+            chip.classList.add('active');
+          }
+        });
+      })();
+    </script>
+  </nav>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Halloween Quick Filters",
+  "tag": "section",
+  "class": "section-halloween-quick-filters",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Displays sticky interactive category and price filter chips above the collection product grid."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Halloween Quick Filters"
+    }
+  ]
+}
+{% endschema %}

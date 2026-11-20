@@ -1,0 +1,116 @@
+{%- doc -%}
+  This snippet is used to render a collection card.
+  To be used inside a block to inherit the block object settings.
+
+  @param {string} card_image - The image to display in the collection card
+  @param {string} children - The content to render inside the collection card
+  @param {object} collection - The collection to render the card for
+  @param {object} block - The block object
+  @param {object} section - The section object
+{%- enddoc -%}
+
+{% liquid
+  assign onboarding = false
+  assign block_settings = block.settings
+
+  if collection == blank
+    assign onboarding = true
+  endif
+
+  assign cat_handle = collection.handle | default: collection.title | downcase
+  assign cat_tag = 'Targeted Relief'
+  assign cat_desc = 'Targeted relief for daily pain & muscle tension'
+  assign cat_badge = 'Doctor Backed'
+
+  if cat_handle contains 'joint' or cat_handle contains 'muscle'
+    assign cat_tag = 'Joint & Mobility'
+    assign cat_desc = 'Targeted joint relief & fast muscle recovery'
+    assign cat_badge = 'Targeted Care'
+  elsif cat_handle contains 'comfort' or cat_handle contains 'relax'
+    assign cat_tag = 'Daily Comfort'
+    assign cat_desc = 'Full-body stress & restorative tension release'
+    assign cat_badge = 'Daily Relief'
+  elsif cat_handle contains 'pain' or cat_handle contains 'relief'
+    assign cat_tag = 'Targeted Relief'
+    assign cat_desc = 'Rapid chronic & acute pain support'
+    assign cat_badge = 'Clinical Support'
+  elsif cat_handle contains 'support' or cat_handle contains 'body'
+    assign cat_tag = 'Postural Support'
+    assign cat_desc = 'Ergonomic alignment & everyday posture'
+    assign cat_badge = 'Alignment Care'
+  elsif cat_handle contains 'wellness' or cat_handle contains 'tools'
+    assign cat_tag = 'Therapy & Recovery'
+    assign cat_desc = 'Clinical-grade therapeutic essentials'
+    assign cat_badge = 'Doctor Backed'
+  endif
+
+  if collection.all_products_count > 0
+    assign cat_badge = collection.all_products_count | append: ' Solutions'
+  endif
+%}
+
+<div
+  class="collection-card bfcm-luxury-collection-card border-style"
+  data-block-id="{{ block.id }}"
+  {% if onboarding %}
+    data-placeholder="true"
+  {% endif %}
+  {{- block.shopify_attributes -}}
+>
+  <a
+    class="collection-card__link"
+    {% unless onboarding %}
+      href="{{ collection.url }}"
+      aria-label="Shop {{ collection.title | default: 'Collection' | escape }}"
+    {% endunless %}
+  >
+    <span class="visually-hidden">{{ collection.title }}</span>
+  </a>
+
+  <div class="collection-card__inner">
+    <!-- Top Image Container / Stage -->
+    <div class="bfcm-card-stage">
+      <!-- Top-Left Category Tag Pill -->
+      <span class="bfcm-card-tag-pill">{{ cat_tag }}</span>
+
+      <!-- Top-Right Circular Action Arrow -->
+      <span class="bfcm-card-circle-arrow" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </span>
+
+      <!-- Centered Image Stage -->
+      <div class="bfcm-card-img-holder">
+        {{ card_image }}
+      </div>
+    </div>
+
+    <!-- Bottom Content Stack -->
+    <div class="bfcm-card-body">
+      <div class="bfcm-card-header-area">
+        <h3 class="bfcm-card-heading">
+          {{ collection.title | default: 'Collection' }}
+        </h3>
+        <p class="bfcm-card-description">{{ cat_desc }}</p>
+      </div>
+
+      <div class="bfcm-card-bottom-bar">
+        <span class="bfcm-solution-badge">
+          <span class="bfcm-badge-dot"></span>
+          {{ cat_badge }}
+        </span>
+        <span class="bfcm-shop-cta">
+          Shop
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="{{ 'collection-card.css' | asset_url }}" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="{{ 'collection-card.css' | asset_url }}"></noscript>

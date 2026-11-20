@@ -1,0 +1,856 @@
+{% comment %}
+  HEALTENCE — Product Trust Benefits
+  -----------------------------------
+  1. Free Shipping → Shipping Policy
+  2. Secure Checkout → Current Product Checkout
+  3. 30 Day Money Back Guarantee → Refund Policy
+
+  Add this section to a Shopify Product Template.
+{% endcomment %}
+
+<section
+  id="ProductTrustBenefits-{{ section.id }}"
+  class="ht-trust-benefits"
+  style="
+    --ht-bg: {{ section.settings.background_color }};
+    --ht-card-bg: {{ section.settings.card_background }};
+    --ht-text: {{ section.settings.text_color }};
+    --ht-icon: {{ section.settings.icon_color }};
+    --ht-border: {{ section.settings.border_color }};
+    --ht-radius: {{ section.settings.card_radius }}px;
+    --ht-card-padding: {{ section.settings.card_padding }}px;
+  "
+>
+  <div class="ht-trust-benefits__wrapper page-width">
+
+    <div class="ht-trust-benefits__grid">
+
+      <!-- ==========================================
+           CARD 1 — FREE SHIPPING
+           ========================================== -->
+
+      <a
+        href="{% if shop.shipping_policy != blank %}{{ shop.shipping_policy.url }}{% else %}/policies/shipping-policy{% endif %}"
+        class="ht-trust-card"
+        aria-label="{{ section.settings.shipping_title }}"
+      >
+
+        <div class="ht-trust-card__icon" aria-hidden="true">
+
+          <svg
+            viewBox="0 0 64 64"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M5 16h35v29H5z"/>
+            <path d="M40 27h10l9 9v9H40z"/>
+            <circle cx="17" cy="49" r="5"/>
+            <circle cx="49" cy="49" r="5"/>
+            <path d="M40 36h18"/>
+            <path d="M10 24h18"/>
+          </svg>
+
+        </div>
+
+        <div class="ht-trust-card__content">
+
+          {%- if section.settings.shipping_title != blank -%}
+            <h3 role="heading" aria-level="2">
+              {{ section.settings.shipping_title }}
+            </h3>
+          {%- endif -%}
+
+          <p>
+            {{ section.settings.shipping_text }}
+          </p>
+
+        </div>
+
+      </a>
+
+
+      <!-- ==========================================
+           CARD 2 — SECURE CHECKOUT
+           ========================================== -->
+
+      {% assign ht_checkout_variant = product.selected_or_first_available_variant %}
+
+      {% if ht_checkout_variant != blank and ht_checkout_variant.available %}
+
+        <form
+          method="post"
+          action="{{ routes.cart_add_url }}"
+          class="ht-trust-card ht-trust-card--checkout"
+        >
+
+          <input
+            type="hidden"
+            name="id"
+            value="{{ ht_checkout_variant.id }}"
+          >
+
+          <input
+            type="hidden"
+            name="quantity"
+            value="1"
+          >
+
+          <input
+            type="hidden"
+            name="return_to"
+            value="/checkout"
+          >
+
+          <button
+            type="submit"
+            class="ht-trust-card__button"
+            aria-label="{{ section.settings.checkout_title }}"
+          >
+
+            <span
+              class="ht-trust-card__icon"
+              aria-hidden="true"
+            >
+
+              <svg
+                viewBox="0 0 64 64"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect
+                  x="15"
+                  y="27"
+                  width="34"
+                  height="28"
+                  rx="4"
+                />
+
+                <path d="M23 27v-7c0-6 4-11 9-11s9 5 9 11v7"/>
+
+                <path d="M27 41l5 5 8-9"/>
+              </svg>
+
+            </span>
+
+            <span class="ht-trust-card__content">
+
+              <span class="ht-trust-card__title">
+                {{ section.settings.checkout_title }}
+              </span>
+
+              <span class="ht-trust-card__text">
+                {{ section.settings.checkout_text }}
+              </span>
+
+            </span>
+
+          </button>
+
+        </form>
+
+      {% else %}
+
+        <div class="ht-trust-card ht-trust-card--disabled">
+
+          <div
+            class="ht-trust-card__icon"
+            aria-hidden="true"
+          >
+
+            <svg
+              viewBox="0 0 64 64"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect
+                x="15"
+                y="27"
+                width="34"
+                height="28"
+                rx="4"
+              />
+
+              <path d="M23 27v-7c0-6 4-11 9-11s9 5 9 11v7"/>
+            </svg>
+
+          </div>
+
+          <div class="ht-trust-card__content">
+
+            {%- if section.settings.checkout_title != blank -%}
+              <h3 role="heading" aria-level="2">
+                {{ section.settings.checkout_title }}
+              </h3>
+            {%- endif -%}
+
+            <p>
+              Currently unavailable
+            </p>
+
+          </div>
+
+        </div>
+
+      {% endif %}
+
+
+      <!-- ==========================================
+           CARD 3 — MONEY BACK GUARANTEE
+           ========================================== -->
+
+      <a
+        href="{% if shop.refund_policy != blank %}{{ shop.refund_policy.url }}{% else %}/policies/refund-policy{% endif %}"
+        class="ht-trust-card"
+        aria-label="{{ section.settings.guarantee_title }}"
+      >
+
+        <div
+          class="ht-trust-card__icon"
+          aria-hidden="true"
+        >
+
+          <svg
+            viewBox="0 0 64 64"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+
+            <path d="M48 17a22 22 0 0 0-34 4"/>
+
+            <path d="M14 21v-9"/>
+
+            <path d="M14 21h9"/>
+
+            <path d="M16 47a22 22 0 0 0 34-4"/>
+
+            <path d="M50 43v9"/>
+
+            <path d="M50 43h-9"/>
+
+            <circle
+              cx="32"
+              cy="32"
+              r="11"
+            />
+
+            <path d="M32 25v14"/>
+
+            <path d="M36 28c-1-2-7-3-8 1-1 4 7 3 8 7 1 4-6 5-9 2"/>
+
+          </svg>
+
+        </div>
+
+        <div class="ht-trust-card__content">
+
+          {%- if section.settings.guarantee_title != blank -%}
+            <h3 role="heading" aria-level="2">
+              {{ section.settings.guarantee_title }}
+            </h3>
+          {%- endif -%}
+
+          <p>
+            {{ section.settings.guarantee_text }}
+          </p>
+
+        </div>
+
+      </a>
+
+    </div>
+
+  </div>
+</section>
+
+
+<style>
+
+  /* ==========================================
+     SECTION
+     ========================================== */
+
+  #ProductTrustBenefits-{{ section.id }} {
+    width: 100%;
+    background: var(--ht-bg);
+    margin-top: {{ section.settings.margin_top }}px;
+    margin-bottom: {{ section.settings.margin_bottom }}px;
+  }
+
+
+  /* ==========================================
+     WRAPPER
+     ========================================== */
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-benefits__wrapper {
+    width: 100%;
+  }
+
+
+  /* ==========================================
+     GRID
+     ========================================== */
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-benefits__grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: {{ section.settings.card_gap }}px;
+  }
+
+
+  /* ==========================================
+     CARD
+     ========================================== */
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    gap: 20px;
+
+    width: 100%;
+    min-height: 150px;
+
+    padding: var(--ht-card-padding);
+
+    box-sizing: border-box;
+
+    background: var(--ht-card-bg);
+    color: var(--ht-text);
+
+    border: 1px solid var(--ht-border);
+    border-radius: var(--ht-radius);
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+
+  /* ==========================================
+     HOVER
+     ========================================== */
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.08);
+
+    border-color: var(--ht-border);
+  }
+
+
+  /* ==========================================
+     ICON
+     ========================================== */
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card__icon {
+    flex: 0 0 64px;
+
+    width: 64px;
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--ht-icon);
+  }
+
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card__icon svg {
+    display: block;
+
+    width: 58px;
+    height: 58px;
+
+    max-width: 100%;
+  }
+
+
+  /* ==========================================
+     CONTENT
+     ========================================== */
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card__content {
+    min-width: 0;
+    flex: 1;
+  }
+
+
+  /* ==========================================
+     TITLE
+     ========================================== */
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card h3,
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card__title {
+    display: block;
+
+    margin: 0 0 7px;
+
+    color: var(--ht-text);
+
+    font-size: 20px;
+    line-height: 1.2;
+
+    font-weight: 700;
+
+    letter-spacing: -0.2px;
+  }
+
+
+  /* ==========================================
+     DESCRIPTION
+     ========================================== */
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card p,
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card__text {
+    display: block;
+
+    margin: 0;
+
+    color: var(--ht-text);
+
+    font-size: 14px;
+    line-height: 1.5;
+
+    font-weight: 400;
+
+    opacity: 0.82;
+  }
+
+
+  /* ==========================================
+     CHECKOUT FORM
+     ========================================== */
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card--checkout {
+    margin: 0;
+    padding: 0;
+  }
+
+
+  /* ==========================================
+     CHECKOUT BUTTON
+     ========================================== */
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card__button {
+    appearance: none;
+    -webkit-appearance: none;
+
+    border: 0;
+    outline: none;
+
+    background: transparent;
+
+    color: inherit;
+
+    width: 100%;
+    min-height: 150px;
+
+    padding: var(--ht-card-padding);
+
+    display: flex;
+    align-items: center;
+
+    gap: 20px;
+
+    text-align: left;
+
+    font: inherit;
+
+    cursor: pointer;
+  }
+
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card__button:focus-visible {
+    outline: 2px solid var(--ht-text);
+    outline-offset: -4px;
+    border-radius: var(--ht-radius);
+  }
+
+
+  /* ==========================================
+     DISABLED
+     ========================================== */
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card--disabled {
+    cursor: default;
+    opacity: 0.65;
+  }
+
+
+  #ProductTrustBenefits-{{ section.id }}
+  .ht-trust-card--disabled:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+
+  /* ==========================================
+     TABLET
+     ========================================== */
+
+  @media screen and (max-width: 989px) {
+
+    #ProductTrustBenefits-{{ section.id }}
+    .ht-trust-benefits__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #ProductTrustBenefits-{{ section.id }}
+    .ht-trust-card:last-child {
+      grid-column: 1 / -1;
+    }
+
+  }
+
+
+  /* ==========================================
+     MOBILE
+     ========================================== */
+
+  @media screen and (max-width: 749px) {
+
+    #ProductTrustBenefits-{{ section.id }} {
+      margin-top: {{ section.settings.mobile_margin_top }}px;
+      margin-bottom: {{ section.settings.mobile_margin_bottom }}px;
+    }
+
+
+    #ProductTrustBenefits-{{ section.id }}
+    .ht-trust-benefits__grid {
+      grid-template-columns: 1fr;
+      gap: {{ section.settings.mobile_card_gap }}px;
+    }
+
+
+    #ProductTrustBenefits-{{ section.id }}
+    .ht-trust-card:last-child {
+      grid-column: auto;
+    }
+
+
+    #ProductTrustBenefits-{{ section.id }}
+    .ht-trust-card {
+      min-height: 125px;
+
+      padding: 20px;
+
+      gap: 16px;
+    }
+
+
+    #ProductTrustBenefits-{{ section.id }}
+    .ht-trust-card__button {
+      min-height: 125px;
+
+      padding: 20px;
+
+      gap: 16px;
+    }
+
+
+    #ProductTrustBenefits-{{ section.id }}
+    .ht-trust-card__icon {
+      flex: 0 0 52px;
+
+      width: 52px;
+      height: 52px;
+    }
+
+
+    #ProductTrustBenefits-{{ section.id }}
+    .ht-trust-card__icon svg {
+      width: 48px;
+      height: 48px;
+    }
+
+
+    #ProductTrustBenefits-{{ section.id }}
+    .ht-trust-card h3,
+    #ProductTrustBenefits-{{ section.id }}
+    .ht-trust-card__title {
+      font-size: 17px;
+      line-height: 1.25;
+
+      margin-bottom: 5px;
+    }
+
+
+    #ProductTrustBenefits-{{ section.id }}
+    .ht-trust-card p,
+    #ProductTrustBenefits-{{ section.id }}
+    .ht-trust-card__text {
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+  }
+
+</style>
+
+
+{% schema %}
+{
+  "name": "Product Trust Benefits",
+  "tag": "section",
+  "class": "section-product-trust-benefits",
+
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "Free Shipping"
+    },
+
+    {
+      "type": "text",
+      "id": "shipping_title",
+      "label": "Title",
+      "default": "Free Shipping"
+    },
+
+    {
+      "type": "text",
+      "id": "shipping_text",
+      "label": "Description",
+      "default": "Free US shipping on orders over $50"
+    },
+
+
+    {
+      "type": "header",
+      "content": "Secure Checkout"
+    },
+
+    {
+      "type": "text",
+      "id": "checkout_title",
+      "label": "Title",
+      "default": "Secure Checkout"
+    },
+
+    {
+      "type": "text",
+      "id": "checkout_text",
+      "label": "Description",
+      "default": "Safe & secure payment"
+    },
+
+
+    {
+      "type": "header",
+      "content": "Money Back Guarantee"
+    },
+
+    {
+      "type": "text",
+      "id": "guarantee_title",
+      "label": "Title",
+      "default": "30 Day Money Back Guarantee"
+    },
+
+    {
+      "type": "text",
+      "id": "guarantee_text",
+      "label": "Description",
+      "default": "Hassle-free returns"
+    },
+
+
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "default": "#FFFFFF"
+    },
+
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#EAF4E8"
+    },
+
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#111111"
+    },
+
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon color",
+      "default": "#111111"
+    },
+
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#DCE8D9"
+    },
+
+
+    {
+      "type": "header",
+      "content": "Card Style"
+    },
+
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card corner radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+
+    {
+      "type": "range",
+      "id": "card_padding",
+      "label": "Card padding",
+      "min": 10,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 25
+    },
+
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Card gap",
+      "min": 5,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+
+
+    {
+      "type": "header",
+      "content": "Desktop Spacing"
+    },
+
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Top margin",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Bottom margin",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+
+
+    {
+      "type": "header",
+      "content": "Mobile Spacing"
+    },
+
+    {
+      "type": "range",
+      "id": "mobile_margin_top",
+      "label": "Top margin",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+
+    {
+      "type": "range",
+      "id": "mobile_margin_bottom",
+      "label": "Bottom margin",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+
+    {
+      "type": "range",
+      "id": "mobile_card_gap",
+      "label": "Card gap",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    }
+
+  ],
+
+  "presets": [
+    {
+      "name": "Product Trust Benefits"
+    }
+  ]
+
+}
+{% endschema %}

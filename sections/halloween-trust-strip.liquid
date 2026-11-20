@@ -1,0 +1,123 @@
+{%- assign current_time = 'now' | date: '%s' | plus: 0 -%}
+{%- assign end_time = settings.halloween_end_date | default: '2026-11-30T23:59:59' | date: '%s' | plus: 0 -%}
+{%- assign halloween_active = false -%}
+{%- if settings.halloween_enabled and current_time <= end_time -%}
+  {%- assign halloween_active = true -%}
+{%- endif -%}
+
+{%- if halloween_active -%}
+  <div class="hw-trust-bar-wrapper page-width bfcm-trust-bar-wrapper">
+    <div class="hw-trust-bar-container hw-trust-strip bfcm-trust-strip" role="region" aria-label="Black Friday Reassurance and Guarantees">
+      <div class="hw-trust-item">
+        <span class="hw-trust-icon icon" aria-hidden="true">🛡️</span>
+        <div class="hw-trust-content">
+          <h4 role="heading" aria-level="2">{{ section.settings.title_1 | default: '30-Day Risk-Free Guarantee' }}</h4>
+          <p>{{ section.settings.text_1 | default: 'Full Refund Protection on All Orders' }}</p>
+        </div>
+      </div>
+
+      <div class="hw-trust-item">
+        <span class="hw-trust-icon icon" aria-hidden="true">🌿</span>
+        <div class="hw-trust-content">
+          <h4 role="heading" aria-level="2">{{ section.settings.title_2 | default: '100% Certified Wellness' }}</h4>
+          <p>{{ section.settings.text_2 | default: 'Pure & Lab-Tested Formulations' }}</p>
+        </div>
+      </div>
+
+      <div class="hw-trust-item">
+        <span class="hw-trust-icon icon" aria-hidden="true">⚡</span>
+        <div class="hw-trust-content">
+          <h4 role="heading" aria-level="2">{{ section.settings.title_3 | default: 'Free US Shipping' }}</h4>
+          <p>{{ section.settings.text_3 | default: 'Free US shipping on orders over $50' }}</p>
+        </div>
+      </div>
+
+      <div class="hw-trust-item">
+        <span class="hw-trust-icon icon" aria-hidden="true">🔒</span>
+        <div class="hw-trust-content">
+          <h4 role="heading" aria-level="2">{{ section.settings.title_4 | default: 'Secure Checkout' }}</h4>
+          <p>{{ section.settings.text_4 | default: '256-Bit Encrypted Payments' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Halloween Trust Strip",
+  "tag": "section",
+  "class": "section-halloween-trust-strip",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Benefit 1"
+    },
+    {
+      "type": "text",
+      "id": "title_1",
+      "label": "Title 1",
+      "default": "Black Friday Price Guarantee"
+    },
+    {
+      "type": "text",
+      "id": "text_1",
+      "label": "Text 1",
+      "default": "30-Day Money-Back Guarantee"
+    },
+    {
+      "type": "header",
+      "content": "Benefit 2"
+    },
+    {
+      "type": "text",
+      "id": "title_2",
+      "label": "Title 2",
+      "default": "100% Organic Wellness"
+    },
+    {
+      "type": "text",
+      "id": "text_2",
+      "label": "Text 2",
+      "default": "Pure & Clean Formulations"
+    },
+    {
+      "type": "header",
+      "content": "Benefit 3"
+    },
+    {
+      "type": "text",
+      "id": "title_3",
+      "label": "Title 3",
+      "default": "Free Fast Shipping"
+    },
+    {
+      "type": "text",
+      "id": "text_3",
+      "label": "Text 3",
+      "default": "Free US shipping on orders over $50"
+    },
+    {
+      "type": "header",
+      "content": "Benefit 4"
+    },
+    {
+      "type": "text",
+      "id": "title_4",
+      "label": "Title 4",
+      "default": "Secure Checkout"
+    },
+    {
+      "type": "text",
+      "id": "text_4",
+      "label": "Text 4",
+      "default": "256-Bit Encrypted Payments"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Halloween Trust Strip"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,175 @@
+{%- doc -%}
+  Renders a product media component.
+
+  @param {object} media - The product media object.
+  @param {boolean} [preview_image_only] - Renders only the preview image without controls.
+  @param {string} [widths] - Image widths for responsive images.
+  @param {string} [sizes] - Image sizes for responsive images.
+  @param {string} [loading] - The loading attribute for the image.
+  @param {object} [block] - The block object.
+  @param {object} [selected_product] - The currently selected product.
+  @param {boolean} [first_3d_model] - Indicates if this is the first 3D model.
+  @param {boolean} [is_main_product_media] - Indicates if this is the main product image.
+  @param {string} [image_ref] - Optional ref attribute for the image element.
+
+  @example
+  {% render 'product-media', media: media, preview_image_only: false, loading: 'lazy' %}
+{%- enddoc -%}
+
+{% liquid
+  assign widths = widths | default: '360, 540, 720, 900, 1100, 1500'
+  assign ref_image_to_transition = ''
+  if settings.transition_to_main_product
+    assign ref_image_to_transition = 'imagesToTransition[]'
+  endif
+  assign resolved_ref = image_ref | default: ref_image_to_transition
+
+  assign resolved_loading = loading
+  assign is_primary = false
+  if is_main_product_media or media.position == 1
+    assign is_primary = true
+    assign resolved_loading = 'eager'
+    assign widths = '360, 540, 750, 900, 1200'
+  elsif resolved_loading == blank
+    assign resolved_loading = 'lazy'
+  endif
+
+  assign resolved_product = selected_product | default: closest.product | default: product
+  assign media_alt_text = media.alt | default: media.preview_image.alt | strip
+  if media_alt_text == blank
+    if resolved_product != blank
+      assign matched_variant_title = ''
+      for v in resolved_product.variants
+        if v.featured_media.id == media.id or v.featured_image.id == media.id
+          assign matched_variant_title = v.title
+          break
+        endif
+      endfor
+      assign media_alt_text = resolved_product.title
+      if matched_variant_title != blank and matched_variant_title != 'Default Title'
+        assign media_alt_text = media_alt_text | append: ' - ' | append: matched_variant_title
+      endif
+      assign view_num = media_index | default: media.position | default: 1
+      assign media_alt_text = media_alt_text | append: ' - View ' | append: view_num | truncate: 125
+    else
+      assign media_alt_text = shop.name
+    endif
+  endif
+%}
+
+<div
+  class="product-media"
+  style="--ratio: {{ media.aspect_ratio }}"
+  data-media-id="{{ media.id }}"
+>
+  {% liquid
+    assign high_res_url = media.preview_image | image_url: width: 3840
+    assign fetch_priority = 'auto'
+    assign base_image_width = 1500
+    if is_primary
+      assign fetch_priority = 'high'
+      assign base_image_width = 900
+    endif
+    assign focal_point_style = '--focal-point: ' | append: media.presentation.focal_point | append: ';'
+  %}
+  {{
+    media.preview_image
+    | image_url: width: base_image_width
+    | image_tag:
+      width: media.preview_image.width,
+      height: media.preview_image.height,
+      widths: widths,
+      alt: media_alt_text,
+      sizes: sizes,
+      loading: resolved_loading,
+      class: 'product-media__image',
+      ref: resolved_ref,
+      data_max_resolution: high_res_url,
+      fetchpriority: fetch_priority,
+      style: focal_point_style
+  }}
+
+  {% unless preview_image_only %}
+    {%- case media.media_type -%}
+      {% when 'model' %}
+        <product-model
+          data-media-id="{{ media.id }}"
+        >
+          <button
+            class="button deferred-media__poster-button button-unstyled"
+            ref="deferredMediaPlayButton"
+            on:click="/showDeferredMedia"
+          >
+            {{
+              media.preview_image
+              | image_url: width: 3840
+              | image_tag:
+                widths: widths,
+                alt: media_alt_text,
+                sizes: sizes,
+                loading: resolved_loading,
+                class: 'deferred-media__poster-image'
+            }}
+            <span class="deferred-media__poster-icon">
+              <span class="visually-hidden">{{ 'accessibility.play_model' | t }}</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                focusable="false"
+                class="icon"
+                fill="none"
+                viewBox="0 0 18 21"
+              >
+                {% render 'icon', icon: '3d-model' %}
+              </svg>
+            </span>
+          </button>
+
+          <template>
+            {% # Should I be using media_tag here instead like on Dawn? 🤔 %}
+            {{ media | model_viewer_tag }}
+          </template>
+        </product-model>
+        <button
+          class="button button-secondary button-shopify-xr"
+          type="button"
+          data-shopify-xr
+          data-shopify-model3d-id="{{ media.id }}"
+          data-shopify-title="{{ selected_product.title | escape }}"
+          data-shopify-xr-hidden
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            focusable="false"
+            class="icon icon-default"
+            fill="none"
+            viewBox="0 0 18 21"
+          >
+            {% render 'icon', icon: '3d-model' %}
+          </svg>
+          {{ 'actions.view_in_your_space' | t }}
+        </button>
+
+        {%- if first_3d_model -%}
+          <script
+            type="application/json"
+            id="ProductModelJSON-{{ selected_product.id }}"
+          >
+            {{ selected_product.media | where: 'media_type', 'model' | json }}
+          </script>
+        {%- endif -%}
+      {% when 'video', 'external_video' %}
+        {%- render 'video',
+          video: media,
+          video_loop: block.settings.video_loop,
+          widths: widths,
+          sizes: sizes,
+          loading: loading,
+          disable_controls: true
+        -%}
+    {% endcase %}
+  {% endunless %}
+</div>
+
+{% render 'deferred-media-product-model-styles' %}

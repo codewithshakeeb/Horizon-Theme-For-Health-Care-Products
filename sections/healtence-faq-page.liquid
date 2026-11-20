@@ -1,0 +1,491 @@
+{%- doc -%}
+  Healtence Standalone FAQ Page Section
+  Zero heavy JS, semantic HTML5 (<details>/<summary>), full keyboard accessibility.
+  Includes dynamic visible-only Schema.org FAQPage & BreadcrumbList JSON-LD.
+{%- enddoc -%}
+
+<style>
+  .healtence-faq-wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 20px 80px 20px;
+    font-family: var(--font-body--family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    color: var(--color-foreground, #1E293B);
+  }
+
+  .healtence-faq-breadcrumbs {
+    margin-bottom: 24px;
+    font-size: 0.85rem;
+    color: #64748B;
+  }
+
+  .healtence-faq-breadcrumbs a {
+    color: #475569;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .healtence-faq-breadcrumbs a:hover {
+    color: #1B4A12;
+    text-decoration: underline;
+  }
+
+  .healtence-faq-breadcrumb-separator {
+    margin: 0 8px;
+    color: #94A3B8;
+  }
+
+  .healtence-faq-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .healtence-faq-title {
+    font-family: var(--font-heading--family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.2;
+    margin: 0 0 12px 0;
+    letter-spacing: -0.02em;
+  }
+
+  .healtence-faq-subtitle {
+    font-size: 1.05rem;
+    color: #475569;
+    max-width: 680px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .healtence-faq-category {
+    margin-bottom: 40px;
+  }
+
+  .healtence-faq-category-title {
+    font-family: var(--font-heading--family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #0F172A;
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .healtence-faq-accordion-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .healtence-faq-item {
+    border: 1.5px solid #E2E8F0;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+
+  .healtence-faq-item:hover {
+    border-color: #CBD5E1;
+  }
+
+  .healtence-faq-item[open] {
+    border-color: #1B4A12;
+    background-color: #FAFDF9;
+    box-shadow: 0 4px 14px rgba(27, 74, 18, 0.06);
+  }
+
+  .healtence-faq-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1E293B;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    gap: 16px;
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .healtence-faq-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .healtence-faq-summary:focus-visible {
+    outline: 2px solid #1B4A12;
+    outline-offset: -2px;
+  }
+
+  .healtence-faq-item[open] .healtence-faq-summary {
+    color: #1B4A12;
+    background-color: rgba(220, 230, 218, 0.25);
+  }
+
+  .healtence-faq-caret {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    color: #64748B;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+  }
+
+  .healtence-faq-item[open] .healtence-faq-caret {
+    transform: rotate(180deg);
+    color: #1B4A12;
+  }
+
+  .healtence-faq-answer {
+    padding: 14px 20px 20px 20px;
+    font-size: 0.95rem;
+    color: #334155;
+    line-height: 1.65;
+    border-top: 1px solid rgba(27, 74, 18, 0.08);
+  }
+
+  .healtence-faq-answer p {
+    margin: 0 0 10px 0;
+  }
+
+  .healtence-faq-answer p:last-child {
+    margin-bottom: 0;
+  }
+
+  .healtence-faq-answer a {
+    color: #1B4A12;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  /* Bottom Contact Card */
+  .healtence-faq-contact-card {
+    background: linear-gradient(135deg, #F0FDF4 0%, #FAFDF9 100%);
+    border: 1.5px solid #D1E5D0;
+    border-radius: 16px;
+    padding: 36px 24px;
+    text-align: center;
+    margin-top: 56px;
+    box-shadow: 0 4px 20px rgba(27, 74, 18, 0.06);
+  }
+
+  .healtence-faq-contact-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    line-height: 1;
+  }
+
+  .healtence-faq-contact-title {
+    font-family: var(--font-heading--family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #0F172A;
+    margin: 0 0 8px 0;
+  }
+
+  .healtence-faq-contact-desc {
+    font-size: 0.95rem;
+    color: #475569;
+    max-width: 580px;
+    margin: 0 auto 20px auto;
+    line-height: 1.5;
+  }
+
+  .healtence-faq-contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .healtence-faq-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 22px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .healtence-faq-btn-primary {
+    background-color: #1B4A12;
+    color: #FFFFFF !important;
+    border: 1.5px solid #1B4A12;
+  }
+
+  .healtence-faq-btn-primary:hover {
+    background-color: #153C0E;
+    border-color: #153C0E;
+    transform: translateY(-1px);
+  }
+
+  .healtence-faq-btn-secondary {
+    background-color: #FFFFFF;
+    color: #1B4A12 !important;
+    border: 1.5px solid #D1E5D0;
+  }
+
+  .healtence-faq-btn-secondary:hover {
+    background-color: #F0FDF4;
+    border-color: #1B4A12;
+    transform: translateY(-1px);
+  }
+
+  .healtence-faq-contact-subtext {
+    font-size: 0.8rem;
+    color: #64748B;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .healtence-faq-wrapper {
+      padding: 24px 16px 60px 16px;
+    }
+    .healtence-faq-summary {
+      padding: 14px 16px;
+      font-size: 0.95rem;
+    }
+    .healtence-faq-answer {
+      padding: 12px 16px 16px 16px;
+    }
+    .healtence-faq-contact-card {
+      padding: 28px 16px;
+    }
+    .healtence-faq-contact-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+    .healtence-faq-btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="healtence-faq-wrapper page-width" id="HealtenceFaq-{{ section.id }}">
+  <!-- Breadcrumbs -->
+  <nav class="healtence-faq-breadcrumbs" aria-label="Breadcrumb">
+    <a href="{{ routes.root_url }}">Home</a>
+    <span class="healtence-faq-breadcrumb-separator" aria-hidden="true">&rsaquo;</span>
+    <span aria-current="page">{{ page.title | default: section.settings.heading | default: 'Frequently Asked Questions' }}</span>
+  </nav>
+
+  <!-- Page Header -->
+  <header class="healtence-faq-header">
+    <h1 class="healtence-faq-title">{{ page.title | default: section.settings.heading | default: 'Frequently Asked Questions' }}</h1>
+    {%- if section.settings.subtitle != blank -%}
+      <p class="healtence-faq-subtitle">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+  </header>
+
+  <!-- FAQ Categories & Questions -->
+  <div class="healtence-faq-content">
+    {%- assign in_category = false -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'category' -%}
+        {%- if in_category -%}
+          </div></div><!-- /.healtence-faq-accordion-group / .healtence-faq-category -->
+        {%- endif -%}
+        <div class="healtence-faq-category" {{ block.shopify_attributes }}>
+          <h2 class="healtence-faq-category-title">{{ block.settings.heading | escape }}</h2>
+          <div class="healtence-faq-accordion-group">
+        {%- assign in_category = true -%}
+      {%- elsif block.type == 'faq' -%}
+        {%- unless in_category -%}
+          <div class="healtence-faq-category">
+            <div class="healtence-faq-accordion-group">
+          {%- assign in_category = true -%}
+        {%- endunless -%}
+        <details class="healtence-faq-item" {{ block.shopify_attributes }}>
+          <summary class="healtence-faq-summary">
+            <span class="healtence-faq-question">{{ block.settings.question | escape }}</span>
+            <span class="healtence-faq-caret" aria-hidden="true">
+              <svg viewBox="0 0 10 6" width="12" height="8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 1l4 4 4-4"/>
+              </svg>
+            </span>
+          </summary>
+          <div class="healtence-faq-answer rte">
+            {{ block.settings.answer }}
+          </div>
+        </details>
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if in_category -%}
+      </div></div><!-- /.healtence-faq-accordion-group / .healtence-faq-category -->
+    {%- endif -%}
+  </div>
+
+  <!-- Contact Card -->
+  {%- if section.settings.show_contact_card -%}
+    <div class="healtence-faq-contact-card" role="region" aria-label="Customer Support Contact">
+      <div class="healtence-faq-contact-icon" aria-hidden="true">💬</div>
+      <h3 class="healtence-faq-contact-title">{{ section.settings.contact_heading | default: 'Still Have Questions?' }}</h3>
+      <p class="healtence-faq-contact-desc">{{ section.settings.contact_text | default: 'Our customer support team is here to assist you Monday through Friday, 9:00 AM to 5:00 PM EST.' }}</p>
+      <div class="healtence-faq-contact-actions">
+        <a href="/pages/contact" class="healtence-faq-btn healtence-faq-btn-primary">Contact Us</a>
+        <a href="mailto:admin@healtence.com" class="healtence-faq-btn healtence-faq-btn-secondary">Email Support</a>
+        <a href="tel:+13042371573" class="healtence-faq-btn healtence-faq-btn-secondary">Call +1 304-237-1573</a>
+      </div>
+      <p class="healtence-faq-contact-subtext">Healtence &bull; Operated by Kinwood LLC &bull; 228 Boarstall Lane, Daniels, WV 25832, United States</p>
+    </div>
+  {%- endif -%}
+</div>
+
+<!-- ==========================================================================
+     DYNAMIC VISIBLE-ONLY FAQPage & BreadcrumbList JSON-LD SCHEMA
+     Generated ONLY from visible blocks rendered on this page. Zero duplicates.
+     ========================================================================== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {%- assign is_first_faq = true -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'faq' and block.settings.question != blank and block.settings.answer != blank -%}
+        {%- unless is_first_faq -%},{%- endunless -%}
+        {
+          "@type": "Question",
+          "name": {{ block.settings.question | strip_html | strip | json }},
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": {{ block.settings.answer | strip_html | strip | json }}
+          }
+        }
+        {%- assign is_first_faq = false -%}
+      {%- endif -%}
+    {%- endfor -%}
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ shop.url }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ page.title | default: section.settings.heading | default: 'Frequently Asked Questions' | json }},
+      "item": "{{ shop.url }}{{ page.url | default: '/pages/faq' }}"
+    }
+  ]
+}
+</script>
+
+{% schema %}
+{
+  "name": "Healtence FAQ Page",
+  "tag": "section",
+  "class": "section-healtence-faq-page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Page Heading",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle / Introduction",
+      "default": "Everything you need to know about our ergonomic pain-relief products, US shipping policies, 30-day returns, and customer care."
+    },
+    {
+      "type": "header",
+      "content": "Contact Card"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_card",
+      "label": "Show Contact Card",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "contact_heading",
+      "label": "Contact Card Heading",
+      "default": "Still Have Questions?"
+    },
+    {
+      "type": "text",
+      "id": "contact_text",
+      "label": "Contact Card Text",
+      "default": "Our customer support team is here to assist you Monday through Friday, 9:00 AM to 5:00 PM EST."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category Header",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Category Title",
+          "default": "Category Name"
+        }
+      ]
+    },
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Question"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Answer details here.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Healtence FAQ Page",
+      "blocks": [
+        {
+          "type": "category",
+          "settings": {
+            "heading": "Shipping & Delivery"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "How much does shipping cost?",
+            "answer": "<p>We offer free standard US shipping on all orders over $50. Orders under $50 ship for a flat rate of $4.90 (Economy) within the United States.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

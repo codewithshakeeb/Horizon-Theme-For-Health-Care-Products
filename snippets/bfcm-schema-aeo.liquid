@@ -1,0 +1,375 @@
+{%- comment -%}
+  Healtence Structured Data (JSON-LD)
+  Single source of truth for Organization, WebSite, ProductGroup, dynamic visible-only FAQPage,
+  BreadcrumbList, and CollectionPage JSON-LD.
+{%- endcomment -%}
+
+<!-- Schema.org Organization JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Healtence",
+  "legalName": "Kinwood LLC",
+  "url": {{ shop.url | json }},
+  {%- if settings.logo != blank -%}
+  "logo": {{ settings.logo | image_url: width: 500 | prepend: "https:" | json }},
+  {%- endif -%}
+  "sameAs": [
+    "https://www.instagram.com/healtence_store",
+    "https://www.facebook.com/healtence",
+    "https://shop.app/m/healtence"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "admin@healtence.com",
+    "telephone": "+1-304-237-1573",
+    "contactType": "customer service"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "228 Boarstall Lane",
+    "addressLocality": "Daniels",
+    "addressRegion": "WV",
+    "postalCode": "25832",
+    "addressCountry": "US"
+  }
+}
+</script>
+
+{%- if template.name == 'index' -%}
+  <!-- Schema.org WebSite & SearchAction JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Healtence",
+    "url": {{ shop.url | json }},
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "{{ shop.url }}/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+{%- endif -%}
+
+{%- if template.name == 'product' and product != blank -%}
+  {%- assign current_variant = product.selected_or_first_available_variant -%}
+  {%- assign rating_val_raw = product.metafields.reviews.rating.value.rating | default: product.metafields.reviews.rating.value | default: product.metafields.judgeme.rating_decimal | default: product.metafields.judgeme.badge.value.rating -%}
+  {%- assign rating_val_num = rating_val_raw | plus: 0.0 -%}
+  {%- assign review_count = product.metafields.reviews.rating_count | default: product.metafields.judgeme.review_count | default: product.metafields.judgeme.badge.value.count -%}
+  {%- assign review_count_num = review_count | plus: 0 -%}
+  {%- assign currency_code = cart.currency.iso_code | default: 'USD' -%}
+  {%- assign clean_product_desc = product.description | strip_html | strip_newlines | strip | truncate: 500 -%}
+  {%- assign valid_from_date = product.published_at | default: product.created_at | date: '%Y-%m-%d' -%}
+
+  {%- assign varies_by_specs = '' -%}
+  {%- for option in product.options_with_values -%}
+    {%- assign opt_name_down = option.name | downcase -%}
+    {%- if opt_name_down contains 'color' or opt_name_down contains 'colour' -%}
+      {%- assign varies_by_specs = varies_by_specs | append: 'https://schema.org/color,' -%}
+    {%- elsif opt_name_down contains 'size' -%}
+      {%- assign varies_by_specs = varies_by_specs | append: 'https://schema.org/size,' -%}
+    {%- elsif opt_name_down contains 'material' -%}
+      {%- assign varies_by_specs = varies_by_specs | append: 'https://schema.org/material,' -%}
+    {%- elsif opt_name_down contains 'pattern' -%}
+      {%- assign varies_by_specs = varies_by_specs | append: 'https://schema.org/pattern,' -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- assign varies_by_array = varies_by_specs | split: ',' | compact -%}
+
+  <!-- Schema.org ProductGroup JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "ProductGroup",
+    "name": {{ product.title | json }},
+    "description": {{ clean_product_desc | json }},
+    "url": "{{ shop.url }}{{ product.url }}",
+    "brand": {
+      "@type": "Brand",
+      "name": "Healtence"
+    },
+    {%- if product.featured_image -%}
+    "image": [
+      "https:{{ product.featured_image | image_url: width: 1200 }}"
+      {%- for image in product.images offset: 1 limit: 4 -%}
+        , "https:{{ image | image_url: width: 1200 }}"
+      {%- endfor -%}
+    ],
+    {%- endif -%}
+    {%- if rating_val_num > 0.0 and review_count_num > 0 -%}
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "{{ rating_val_num }}",
+      "bestRating": "5",
+      "worstRating": "1",
+      "reviewCount": {{ review_count_num }}
+    },
+    {%- endif -%}
+    "productGroupID": "{{ product.id }}",
+    {%- if varies_by_array.size > 0 -%}
+    "variesBy": [
+      {%- for v_prop in varies_by_array -%}
+        "{{ v_prop }}"{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ],
+    {%- endif -%}
+    "hasVariant": [
+      {%- for variant in product.variants -%}
+        {%- assign clean_sku = variant.sku | handleize | upcase -%}
+        {%- if clean_sku == blank -%}
+          {%- assign clean_sku = variant.id | append: '' -%}
+        {%- endif -%}
+        {
+          "@type": "Product",
+          "name": {{ product.title | append: ' - ' | append: variant.title | json }},
+          "description": {{ clean_product_desc | json }},
+          "sku": {{ clean_sku | json }},
+          "mpn": {{ clean_sku | json }},
+          {%- for option in product.options_with_values -%}
+            {%- assign opt_idx = forloop.index0 -%}
+            {%- assign opt_val = variant.options[opt_idx] -%}
+            {%- assign opt_name_down = option.name | downcase -%}
+            {%- if opt_val != blank -%}
+              {%- if opt_name_down contains 'color' or opt_name_down contains 'colour' -%}
+                "color": {{ opt_val | json }},
+              {%- elsif opt_name_down contains 'size' -%}
+                "size": {{ opt_val | json }},
+              {%- elsif opt_name_down contains 'material' -%}
+                "material": {{ opt_val | json }},
+              {%- elsif opt_name_down contains 'pattern' -%}
+                "pattern": {{ opt_val | json }},
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+          "image": "https:{{ variant.image.src | default: product.featured_image | image_url: width: 1000 }}",
+          "offers": {
+            "@type": "Offer",
+            "price": "{{ variant.price | divided_by: 100.0 }}",
+            "priceCurrency": "{{ currency_code }}",
+            "priceValidUntil": "2026-12-31",
+            "validFrom": "{{ valid_from_date }}",
+            "url": "{{ shop.url }}{{ variant.url }}",
+            "itemCondition": "https://schema.org/NewCondition",
+            "availability": "{% if variant.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
+            "seller": {
+              "@type": "Organization",
+              "name": "Healtence"
+            },
+            {%- assign variant_shipping_rate = "4.90" -%}
+            {%- if variant.price >= 5000 -%}
+              {%- assign variant_shipping_rate = "0.00" -%}
+            {%- endif -%}
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "{{ variant_shipping_rate }}",
+                "currency": "USD"
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "US"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 1,
+                  "maxValue": 2,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 5,
+                  "maxValue": 10,
+                  "unitCode": "DAY"
+                }
+              }
+            },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "US",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+              "merchantReturnDays": 30,
+              "returnMethod": "https://schema.org/ReturnByMail",
+              "returnFees": "https://schema.org/FreeReturn"
+            }
+          }
+        }{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ]
+  }
+  </script>
+
+  <!-- Schema.org BreadcrumbList JSON-LD (Product) -->
+  {%- assign pdp_collection = collection -%}
+  {%- if pdp_collection == blank or pdp_collection.handle == 'pain-relief-solutions' -%}
+    {%- for c in product.collections -%}
+      {%- if c.handle != 'pain-relief-solutions' and c.handle != 'frontpage' -%}
+        {%- assign pdp_collection = c -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if pdp_collection == blank -%}
+      {%- assign pdp_collection = product.collections.first -%}
+    {%- endif -%}
+  {%- endif -%}
+  {%- assign has_sub_collection = false -%}
+  {%- if pdp_collection != blank and pdp_collection.handle != 'pain-relief-solutions' -%}
+    {%- assign has_sub_collection = true -%}
+  {%- endif -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ shop.url }}"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Pain Relief Solutions",
+        "item": "{{ shop.url }}/collections/pain-relief-solutions"
+      },
+      {%- if has_sub_collection -%}
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": {{ pdp_collection.title | json }},
+        "item": "{{ shop.url }}{{ pdp_collection.url }}"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": {{ product.title | json }},
+        "item": "{{ shop.url }}{{ product.url }}"
+      }
+      {%- else -%}
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": {{ product.title | json }},
+        "item": "{{ shop.url }}{{ product.url }}"
+      }
+      {%- endif -%}
+    ]
+  }
+  </script>
+
+  <!-- Dynamic Visible-Only Schema.org FAQPage JSON-LD -->
+  {%- if product.description contains 'Frequently Asked Questions' -%}
+    {%- assign faq_section = product.description | split: 'Frequently Asked Questions' | last -%}
+    {%- assign faq_blocks = faq_section | split: '<h3' -%}
+    {%- assign faq_count = 0 -%}
+    {%- capture faq_items -%}
+      {%- for faq_block in faq_blocks offset: 1 -%}
+        {%- if faq_block contains '</h3>' and faq_block contains '<p' -%}
+          {%- assign h3_head = faq_block | split: '</h3>' | first -%}
+          {%- assign h3_attrs = h3_head | split: '>' | first | append: '>' -%}
+          {%- assign q_raw = h3_head | remove_first: h3_attrs | strip_html | strip_newlines | strip -%}
+          {%- assign after_h3 = faq_block | split: '</h3>' | last -%}
+          {%- assign p_parts = after_h3 | split: '<p' -%}
+          {%- if p_parts.size > 1 -%}
+            {%- assign p_head = p_parts[1] | split: '</p>' | first -%}
+            {%- assign p_attrs = p_head | split: '>' | first | append: '>' -%}
+            {%- assign a_raw = p_head | remove_first: p_attrs | strip_html | strip_newlines | strip -%}
+            {%- if q_raw != blank and a_raw != blank -%}
+              {%- if faq_count > 0 -%},{%- endif -%}
+              {%- assign faq_count = faq_count | plus: 1 -%}
+              {
+                "@type": "Question",
+                "name": {{ q_raw | json }},
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": {{ a_raw | json }}
+                }
+              }
+            {%- endif -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- if faq_count > 0 -%}
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{{ faq_items }}]
+      }
+      </script>
+    {%- endif -%}
+  {%- endif -%}
+
+  <!-- Machine-Readable Structured Product Data for Autonomous Shopping Agents -->
+  <div class="visually-hidden bfcm-agent-specs" data-agent-entity="product-metadata" aria-hidden="true">
+    <table>
+      <caption>Healtence Product Specifications</caption>
+      <tbody>
+        <tr><th>Product Title</th><td>{{ product.title | escape }}</td></tr>
+        <tr><th>Brand</th><td>Healtence</td></tr>
+        <tr><th>Default Price</th><td data-agent-price="{{ current_variant.price }}">{{ current_variant.price | money }}</td></tr>
+        <tr><th>Default Variant</th><td data-agent-variant-id="{{ current_variant.id }}">{{ current_variant.title | escape }}</td></tr>
+        <tr><th>Availability</th><td data-agent-available="{{ current_variant.available }}">{% if current_variant.available %}InStock{% else %}OutOfStock{% endif %}</td></tr>
+        <tr><th>Return Policy</th><td>30-Day Money-Back Guarantee</td></tr>
+        <tr><th>Shipping</th><td>Free US shipping on orders over $50, $4.90 flat rate under $50 (1–2 business days handling, 5–10 business days US delivery)</td></tr>
+      </tbody>
+    </table>
+  </div>
+{%- elsif template.name == 'collection' and collection != blank -%}
+  <!-- Schema.org BreadcrumbList JSON-LD (Collection) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ shop.url }}/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ collection.title | json }},
+        "item": "{{ shop.url }}{{ collection.url }}"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Schema.org CollectionPage JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": {{ collection.title | json }},
+    "description": {{ collection.description | strip_html | strip_newlines | default: page_description | default: shop.description | truncate: 450 | json }},
+    "url": "{{ shop.url }}{{ collection.url }}"{% if collection.products_count > 0 %},
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": {{ collection.products_count }},
+      "itemListElement": [
+        {%- for item_prod in collection.products limit: 12 -%}
+          {
+            "@type": "ListItem",
+            "position": {{ forloop.index }},
+            "url": "{{ shop.url }}{{ item_prod.url }}",
+            "name": {{ item_prod.title | json }}
+          }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ]
+    }{% endif %}
+  }
+  </script>
+{%- endif -%}

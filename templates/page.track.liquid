@@ -1,0 +1,756 @@
+{%- comment -%}
+  Healtence — Order tracking page (v2, mobile-first)
+  File:      templates/page.track.liquid
+  Use:       Online Store > Pages > "Track your order" > Theme template: track
+  Data:      Shopify App Proxy at /apps/track (proxied to Vercel /api/track)
+  Deep link: /pages/track?tracking_number=LP00123456789012  (runs the search automatically)
+
+  Settings on the wrapper below:
+    data-endpoint     App Proxy path
+    data-contact-url  Link shown when tracking can't be found
+    --ht-accent       Brand colour (in the <style> block)
+{%- endcomment -%}
+
+<div class="ht-track" id="HtTrack" data-endpoint="/apps/track" data-contact-url="/pages/contact">
+  <div class="ht-wrap">
+    <header class="ht-head">
+      <h1 class="ht-title">{{ page.title | default: 'Track your order' | escape }}</h1>
+      {%- if page.content != blank -%}
+        <div class="ht-lead rte">{{ page.content }}</div>
+      {%- else -%}
+        <p class="ht-lead">Enter the tracking number from your shipping confirmation email.</p>
+      {%- endif -%}
+    </header>
+
+    <form class="ht-form" id="HtTrackForm" novalidate aria-label="Track your order" data-tool-name="track-order">
+      <label class="ht-label" for="HtTrackInput">Tracking number</label>
+      <div class="ht-field">
+        <div class="ht-input-wrap">
+          <input
+            class="ht-input"
+            id="HtTrackInput"
+            name="tracking_number"
+            type="text"
+            inputmode="text"
+            enterkeyhint="search"
+            autocomplete="off"
+            autocapitalize="characters"
+            spellcheck="false"
+            maxlength="48"
+            placeholder="e.g. LP00123456789012"
+            aria-describedby="HtTrackFieldError"
+            required
+          >
+          <button class="ht-clear" id="HtTrackClear" type="button" aria-label="Clear tracking number" hidden>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 6l8 8M14 6l-8 8"/></svg>
+          </button>
+        </div>
+        <button class="ht-submit" id="HtTrackButton" type="submit">
+          <span class="ht-submit__text">Track order</span>
+          <span class="ht-spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+      <p class="ht-field-error" id="HtTrackFieldError" hidden></p>
+      <div class="ht-recent" id="HtTrackRecent" hidden></div>
+    </form>
+
+    <div class="ht-result" id="HtTrackResult" aria-live="polite" tabindex="-1"></div>
+  </div>
+</div>
+
+<style>
+  .ht-track {
+    --ht-accent: #1f6f5c;
+    --ht-accent-ink: #ffffff;
+    --ht-success: #1d7a3e;
+    --ht-warning: #a16207;
+    --ht-danger: #b42318;
+    --ht-tone: var(--ht-accent);
+    --ht-line: color-mix(in srgb, currentColor 13%, transparent);
+    --ht-muted: color-mix(in srgb, currentColor 62%, transparent);
+    --ht-surface: color-mix(in srgb, currentColor 3.5%, transparent);
+    padding: clamp(24px, 6vw, 56px) 16px calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+  .ht-track *, .ht-track *::before, .ht-track *::after { box-sizing: border-box; }
+  .ht-track [data-tone="delivered"] { --ht-tone: var(--ht-success); }
+  .ht-track [data-tone="exception"] { --ht-tone: var(--ht-danger); }
+  .ht-track [data-tone="unknown"] { --ht-tone: var(--ht-warning); }
+
+  .ht-wrap { max-width: 640px; margin: 0 auto; }
+  .ht-head { margin-bottom: 24px; }
+  .ht-track .ht-title {
+    margin: 0 0 8px; font-size: clamp(28px, 7vw, 40px); line-height: 1.1; letter-spacing: -0.01em;
+  }
+  .ht-lead { margin: 0; color: var(--ht-muted); font-size: 15px; line-height: 1.5; }
+  .ht-lead p { margin: 0; }
+
+  /* ── Form (hardened against theme input styles) ── */
+  .ht-form { margin-bottom: 28px; }
+  .ht-label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
+  .ht-field { display: flex; gap: 10px; }
+  .ht-input-wrap { position: relative; flex: 1; min-width: 0; }
+  .ht-track .ht-input {
+    display: block; width: 100%; height: 54px !important; min-height: 54px !important; margin: 0 !important;
+    padding: 0 44px 0 16px !important;
+    font: inherit; font-size: 16px !important; letter-spacing: 0.04em; line-height: 54px;
+    color: inherit; background: transparent !important;
+    border: 1.5px solid color-mix(in srgb, currentColor 22%, transparent) !important;
+    border-radius: 12px !important; box-shadow: none !important; outline: none;
+    -webkit-appearance: none; appearance: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .ht-track .ht-input::placeholder { letter-spacing: 0; color: var(--ht-muted); opacity: 1; }
+  .ht-track .ht-input:focus {
+    border-color: var(--ht-accent) !important;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--ht-accent) 18%, transparent) !important;
+  }
+  .ht-track .ht-input[aria-invalid="true"] { border-color: var(--ht-danger) !important; }
+  .ht-clear {
+    position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+    display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%;
+    background: var(--ht-surface); color: var(--ht-muted); cursor: pointer;
+  }
+  .ht-clear[hidden] { display: none; }
+  .ht-clear svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+  .ht-submit {
+    position: relative; flex: none; height: 54px; padding: 0 28px; border: 0; border-radius: 12px;
+    background: var(--ht-accent); color: var(--ht-accent-ink); font: inherit; font-size: 16px; font-weight: 600;
+    cursor: pointer; white-space: nowrap; transition: background .15s;
+  }
+  .ht-submit:hover { background: color-mix(in srgb, var(--ht-accent) 86%, #000); }
+  .ht-submit:disabled { cursor: progress; }
+  .ht-spinner {
+    display: none; position: absolute; inset: 0; margin: auto; width: 20px; height: 20px;
+    border: 2px solid rgba(255,255,255,.35); border-top-color: currentColor; border-radius: 50%;
+    animation: ht-spin .7s linear infinite;
+  }
+  .ht-submit.is-loading .ht-submit__text { visibility: hidden; }
+  .ht-submit.is-loading .ht-spinner { display: block; }
+  .ht-field-error { margin: 8px 0 0; color: var(--ht-danger); font-size: 14px; }
+  .ht-recent { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; color: var(--ht-muted); }
+  .ht-recent[hidden] { display: none; }
+  .ht-chip {
+    max-width: 100%; padding: 6px 12px; border: 1px solid var(--ht-line); border-radius: 999px;
+    background: transparent; color: inherit; font: inherit; font-size: 13px; font-variant-numeric: tabular-nums;
+    cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .ht-chip:hover { border-color: var(--ht-accent); color: var(--ht-accent); }
+  .ht-track button:focus-visible, .ht-track a:focus-visible { outline: 2px solid var(--ht-accent); outline-offset: 3px; }
+  .ht-result:focus { outline: none; }
+
+  /* ── Status card ── */
+  .ht-card { border: 1px solid var(--ht-line); border-radius: 18px; overflow: hidden; }
+  .ht-hero {
+    padding: 22px 22px 20px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ht-tone) 9%, transparent), transparent 85%);
+  }
+  .ht-hero__row { display: flex; align-items: center; gap: 14px; }
+  .ht-hero__icon {
+    flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px;
+    background: var(--ht-tone); color: #fff;
+  }
+  .ht-hero__icon svg { width: 24px; height: 24px; }
+  .ht-hero__status { margin: 0; font-size: clamp(24px, 6vw, 30px); line-height: 1.1; font-weight: 700; color: var(--ht-tone); }
+  .ht-hero__days { margin: 4px 0 0; font-size: 14px; color: var(--ht-muted); }
+  .ht-hero__desc { margin: 16px 0 0; font-size: 16px; line-height: 1.45; font-weight: 500; }
+  .ht-hero__when { margin: 4px 0 0; font-size: 14px; color: var(--ht-muted); }
+  .ht-number {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-top: 16px; padding: 10px 12px 10px 14px; border-radius: 12px; background: var(--ht-surface);
+    font-size: 13px;
+  }
+  .ht-number__label { color: var(--ht-muted); }
+  .ht-number__value { display: block; margin-top: 1px; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .ht-copy {
+    flex: none; padding: 7px 12px; border: 1px solid var(--ht-line); border-radius: 999px;
+    background: transparent; color: inherit; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .ht-copy:hover { border-color: var(--ht-accent); color: var(--ht-accent); }
+
+  .ht-progress { display: grid; grid-template-columns: repeat(4, 1fr); list-style: none; margin: 0; padding: 18px 10px 20px; border-top: 1px solid var(--ht-line); }
+  .ht-step { position: relative; padding-top: 22px; text-align: center; font-size: 12px; line-height: 1.25; color: var(--ht-muted); }
+  .ht-step::after { content: ""; position: absolute; top: 6px; right: 50%; width: 100%; height: 3px; border-radius: 3px; background: var(--ht-line); }
+  .ht-step:first-child::after { display: none; }
+  .ht-step::before {
+    content: ""; position: absolute; z-index: 1; top: 1px; left: 50%; width: 13px; height: 13px; margin-left: -6.5px;
+    border-radius: 50%; background: var(--ht-line);
+  }
+  .ht-step.is-done::before, .ht-step.is-done::after { background: var(--ht-tone); }
+  .ht-step.is-current { color: inherit; font-weight: 650; }
+  .ht-step.is-current::before { box-shadow: 0 0 0 5px color-mix(in srgb, var(--ht-tone) 22%, transparent); }
+
+  .ht-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; border-top: 1px solid var(--ht-line); }
+  .ht-fact { padding: 14px 18px; min-width: 0; }
+  .ht-fact:nth-child(even) { border-left: 1px solid var(--ht-line); }
+  .ht-fact:nth-child(n+3) { border-top: 1px solid var(--ht-line); }
+  .ht-fact dt { margin: 0 0 3px; font-size: 12px; color: var(--ht-muted); }
+  .ht-fact dd { margin: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+  .ht-fact a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ── Timeline ── */
+  .ht-history { margin-top: 32px; }
+  .ht-history__title { margin: 0 0 4px; font-size: 20px; }
+  .ht-history__sub { margin: 0 0 18px; font-size: 14px; color: var(--ht-muted); }
+  .ht-day { margin: 0; padding: 0; list-style: none; }
+  .ht-day__label {
+    position: sticky; top: 0; z-index: 2; margin: 0; padding: 8px 0;
+    font-size: 13px; font-weight: 650; color: var(--ht-muted);
+    background: var(--ht-page-bg, transparent);
+  }
+  .ht-events { list-style: none; margin: 0 0 8px; padding: 0; }
+  .ht-event { position: relative; display: grid; grid-template-columns: 30px 1fr auto; gap: 12px; padding: 0 0 20px; }
+  .ht-event::before { content: ""; position: absolute; left: 14px; top: 32px; bottom: 2px; width: 2px; background: var(--ht-line); }
+  .ht-event.is-last::before { display: none; }
+  .ht-event__icon {
+    display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+    border: 1.5px solid var(--ht-line); color: var(--ht-muted);
+  }
+  .ht-event__icon svg { width: 15px; height: 15px; }
+  .ht-event[data-category="delivered"] .ht-event__icon { color: var(--ht-success); }
+  .ht-event[data-category="exception"] .ht-event__icon { color: var(--ht-danger); }
+  .ht-event.is-latest .ht-event__icon { background: var(--ht-tone); border-color: var(--ht-tone); color: #fff; }
+  .ht-event__body { min-width: 0; padding-top: 4px; }
+  .ht-event__desc { margin: 0; font-size: 15px; line-height: 1.4; overflow-wrap: anywhere; }
+  .ht-event.is-latest .ht-event__desc { font-weight: 650; }
+  .ht-event__where { margin: 3px 0 0; font-size: 13px; color: var(--ht-muted); }
+  .ht-event__time { padding-top: 5px; font-size: 13px; color: var(--ht-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ht-more {
+    display: block; width: 100%; margin-top: 4px; padding: 12px; border: 1px solid var(--ht-line); border-radius: 12px;
+    background: transparent; color: inherit; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .ht-more:hover { border-color: var(--ht-accent); color: var(--ht-accent); }
+  .ht-hidden { display: none; }
+
+  /* ── Notices & loading ── */
+  .ht-notice {
+    display: flex; gap: 12px; padding: 16px 18px; border-radius: 14px;
+    border: 1px solid color-mix(in srgb, var(--ht-tone) 32%, transparent);
+    background: color-mix(in srgb, var(--ht-tone) 7%, transparent);
+  }
+  .ht-notice + .ht-card { margin-top: 14px; }
+  .ht-notice__icon { flex: none; color: var(--ht-tone); }
+  .ht-notice__icon svg { width: 22px; height: 22px; }
+  .ht-notice__title { margin: 0; font-weight: 700; font-size: 15px; }
+  .ht-notice__text { margin: 3px 0 0; font-size: 14px; line-height: 1.45; }
+  .ht-notice__actions { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; font-size: 14px; }
+  .ht-link { padding: 0; border: 0; background: none; color: var(--ht-accent); font: inherit; font-weight: 650; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+  .ht-skeleton { padding: 22px; border: 1px solid var(--ht-line); border-radius: 18px; }
+  .ht-bar {
+    height: 14px; margin-bottom: 14px; border-radius: 7px;
+    background: linear-gradient(90deg, var(--ht-line) 25%, var(--ht-surface) 50%, var(--ht-line) 75%);
+    background-size: 200% 100%; animation: ht-shimmer 1.3s ease-in-out infinite;
+  }
+  .ht-bar:last-child { margin-bottom: 0; }
+  .ht-reveal { animation: ht-reveal .3s ease-out; }
+
+  @keyframes ht-spin { to { transform: rotate(360deg); } }
+  @keyframes ht-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+  @keyframes ht-reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  @media (max-width: 560px) {
+    .ht-track { padding-left: 14px; padding-right: 14px; }
+    .ht-field { flex-direction: column; }
+    .ht-submit { width: 100%; }
+    .ht-hero { padding: 18px 16px; }
+    .ht-hero__icon { width: 42px; height: 42px; border-radius: 12px; }
+    .ht-progress { padding: 16px 2px 18px; }
+    .ht-step { font-size: 11px; }
+    .ht-fact { padding: 12px 14px; }
+    .ht-fact dd { font-size: 14px; }
+    .ht-event { grid-template-columns: 30px 1fr; row-gap: 2px; }
+    .ht-event__time { grid-column: 2; padding-top: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ht-track *, .ht-track *::before, .ht-track *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<script>
+  (() => {
+    'use strict';
+
+    const root = document.getElementById('HtTrack');
+    if (!root) return;
+
+    const ENDPOINT = root.dataset.endpoint || '/apps/track';
+    const CONTACT_URL = root.dataset.contactUrl || '';
+    const REQUEST_TIMEOUT_MS = 20000;
+    const VISIBLE_EVENTS = 6;
+    const NUMBER_RE = /^[A-Z0-9]{8,40}$/;
+    const RECENT_KEY = 'ht-track-recent';
+    const DAY_MS = 86400000;
+
+    const form = document.getElementById('HtTrackForm');
+    const input = document.getElementById('HtTrackInput');
+    const clearBtn = document.getElementById('HtTrackClear');
+    const button = document.getElementById('HtTrackButton');
+    const fieldError = document.getElementById('HtTrackFieldError');
+    const recentBox = document.getElementById('HtTrackRecent');
+    const result = document.getElementById('HtTrackResult');
+
+    // Use the page's real background behind the sticky date labels
+    try {
+      let bg = 'transparent';
+      for (let node = root; node && bg === 'transparent'; node = node.parentElement) {
+        const c = getComputedStyle(node).backgroundColor;
+        if (c && c !== 'transparent' && c !== 'rgba(0, 0, 0, 0)') bg = c;
+      }
+      if (bg === 'transparent') bg = getComputedStyle(document.body).backgroundColor || '#fff';
+      root.style.setProperty('--ht-page-bg', bg);
+    } catch (e) { /* non-critical */ }
+
+    const LABELS = {
+      info_received: 'Order processed',
+      in_transit: 'In transit',
+      out_for_delivery: 'Out for delivery',
+      pickup: 'Ready for pickup',
+      delivered: 'Delivered',
+      exception: 'Delivery issue',
+      unknown: 'Status pending',
+    };
+    const STEPS = ['Processed', 'In transit', 'Out for delivery', 'Delivered'];
+    const STEP_INDEX = { unknown: 0, info_received: 0, in_transit: 1, exception: 1, out_for_delivery: 2, pickup: 2, delivered: 3 };
+    const RETRYABLE = ['TIMEOUT', 'NETWORK', 'BAD_RESPONSE', 'RATE_LIMITED', 'UPSTREAM_TIMEOUT', 'UPSTREAM_ERROR', 'UPSTREAM_BLOCKED', 'UPSTREAM_RATE_LIMITED', 'UPSTREAM_BAD_RESPONSE', 'SERVER_MISCONFIGURED'];
+
+    const svg = (inner) =>
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + inner + '</svg>';
+    const ICONS = {
+      delivered: svg('<path d="M20 6L9 17l-5-5"/>'),
+      in_transit: svg('<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>'),
+      out_for_delivery: svg('<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'),
+      pickup: svg('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'),
+      info_received: svg('<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>'),
+      exception: svg('<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'),
+      unknown: svg('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
+      alert: svg('<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'),
+    };
+    const iconFor = (category) => ICONS[category] || ICONS.in_transit;
+
+    let locale = 'en-US';
+    try {
+      locale = Intl.DateTimeFormat.supportedLocalesOf([document.documentElement.lang || navigator.language])[0] || 'en-US';
+    } catch (e) { /* keep default */ }
+
+    let requestCounter = 0;
+    let lastNumber = '';
+
+    // ───────── DOM helper ─────────
+    function h(tag, attrs, ...children) {
+      const el = document.createElement(tag);
+      if (attrs) {
+        for (const [key, value] of Object.entries(attrs)) {
+          if (value == null || value === false) continue;
+          if (key === 'class') el.className = value;
+          else if (key === 'svg') el.innerHTML = value;
+          else if (key.startsWith('on')) el.addEventListener(key.slice(2), value);
+          else el.setAttribute(key, value === true ? '' : String(value));
+        }
+      }
+      for (const child of children.flat()) {
+        if (child == null || child === false || child === '') continue;
+        el.append(child instanceof Node ? child : document.createTextNode(String(child)));
+      }
+      return el;
+    }
+
+    // ───────── Formatting ─────────
+    const fmt = (options, date) => new Intl.DateTimeFormat(locale, options).format(date);
+    function dateOnly(isoDate) {
+      const [y, m, d] = isoDate.split('-').map(Number);
+      return new Date(Date.UTC(y, m - 1, d, 12));
+    }
+    function dayKey(event) {
+      if (event.date) return event.date;
+      if (event.timestamp) return new Date(event.timestamp).toISOString().slice(0, 10);
+      return '';
+    }
+    function dayLabel(key) {
+      if (!key) return 'Earlier';
+      const date = dateOnly(key);
+      const sameYear = date.getUTCFullYear() === new Date().getFullYear();
+      return fmt({ weekday: 'long', month: 'long', day: 'numeric', year: sameYear ? undefined : 'numeric', timeZone: 'UTC' }, date);
+    }
+    function clock(event) {
+      try {
+        if (event.time) {
+          const [hh, mm] = event.time.split(':').map(Number);
+          return fmt({ hour: 'numeric', minute: '2-digit', timeZone: 'UTC' }, new Date(Date.UTC(2000, 0, 1, hh, mm)));
+        }
+        if (event.timestamp) return fmt({ hour: 'numeric', minute: '2-digit' }, new Date(event.timestamp));
+      } catch (e) { /* ignore */ }
+      return '';
+    }
+    function fullWhen(event) {
+      try {
+        const key = dayKey(event);
+        if (!key) return '';
+        const date = fmt({ month: 'short', day: 'numeric', timeZone: 'UTC' }, dateOnly(key));
+        const time = clock(event);
+        return time ? date + ', ' + time : date;
+      } catch (e) { return ''; }
+    }
+    function formatEta(eta) {
+      if (!eta) return '';
+      try {
+        const f = (iso) => fmt({ month: 'short', day: 'numeric' }, new Date(iso));
+        if (eta.from && eta.to && f(eta.from) !== f(eta.to)) return f(eta.from) + ' – ' + f(eta.to);
+        if (eta.to || eta.from) return f(eta.to || eta.from);
+      } catch (e) { /* fall through */ }
+      return eta.text || '';
+    }
+    const plural = (n, word) => n + ' ' + word + (n === 1 ? '' : 's');
+    function journeyText(events, category) {
+      const stamps = events.map((e) => Date.parse(e.timestamp)).filter(Boolean);
+      if (!stamps.length) return '';
+      const start = Math.min(...stamps);
+      if (category === 'delivered') {
+        const took = Math.max(0, Math.round((Math.max(...stamps) - start) / DAY_MS));
+        return took ? 'Delivered in ' + plural(took, 'day') : 'Delivered the same day it shipped';
+      }
+      const days = Math.max(0, Math.floor((Date.now() - start) / DAY_MS));
+      return days ? plural(days, 'day') + ' since it shipped' : 'Shipped today';
+    }
+
+    // ───────── Recent searches ─────────
+    function readRecent() {
+      try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]').filter((n) => NUMBER_RE.test(n)).slice(0, 3); }
+      catch (e) { return []; }
+    }
+    function saveRecent(number) {
+      try {
+        const list = [number].concat(readRecent().filter((n) => n !== number)).slice(0, 3);
+        localStorage.setItem(RECENT_KEY, JSON.stringify(list));
+      } catch (e) { /* storage blocked */ }
+      renderRecent();
+    }
+    
+    function renderRecent() {
+      const list = readRecent().filter((n) => n !== lastNumber);
+      recentBox.hidden = !list.length;
+      
+      if (!list.length) {
+        recentBox.replaceChildren();
+        return;
+      }
+
+      recentBox.replaceChildren(
+        h('span', null, 'Recent:'),
+        ...list.map((n) => h('button', { type: 'button', class: 'ht-chip', onclick: () => track(n) }, n))
+      );
+    }
+
+    // ───────── UI states ─────────
+    function setLoading(isLoading) {
+      button.disabled = isLoading;
+      button.classList.toggle('is-loading', isLoading);
+      button.setAttribute('aria-busy', String(isLoading));
+    }
+    function showFieldError(message) {
+      fieldError.textContent = message;
+      fieldError.hidden = false;
+      input.setAttribute('aria-invalid', 'true');
+      input.focus();
+    }
+    function clearFieldError() {
+      fieldError.hidden = true;
+      fieldError.textContent = '';
+      input.removeAttribute('aria-invalid');
+    }
+    function syncClear() {
+      clearBtn.hidden = !input.value;
+    }
+
+    function renderSkeleton() {
+      result.replaceChildren(
+        h('div', { class: 'ht-skeleton', 'aria-label': 'Loading tracking details' },
+          h('div', { class: 'ht-bar', style: 'width:30%' }),
+          h('div', { class: 'ht-bar', style: 'width:55%;height:24px' }),
+          h('div', { class: 'ht-bar', style: 'width:85%' }),
+          h('div', { class: 'ht-bar', style: 'width:65%' })
+        )
+      );
+    }
+
+    function renderError(error) {
+      const code = (error && error.code) || 'UNKNOWN';
+      const notFound = code === 'NOT_FOUND';
+      const title = notFound ? 'No updates yet' : code === 'INVALID_TRACKING_NUMBER' ? 'Check the tracking number' : 'Tracking couldn’t load';
+      const message = (error && error.message) || 'Something went wrong. Try again in a moment.';
+
+      const actions = [];
+      if (RETRYABLE.includes(code) && lastNumber) {
+        actions.push(h('button', { type: 'button', class: 'ht-link', onclick: () => track(lastNumber) }, 'Try again'));
+      }
+      if (notFound && CONTACT_URL) actions.push(h('a', { class: 'ht-link', href: CONTACT_URL }, 'Contact us about this order'));
+
+      result.replaceChildren(
+        h('div', { class: 'ht-notice ht-reveal', 'data-tone': notFound ? 'unknown' : 'exception', role: notFound ? 'status' : 'alert' },
+          h('span', { class: 'ht-notice__icon', svg: ICONS.alert }),
+          h('div', null,
+            h('p', { class: 'ht-notice__title' }, title),
+            h('p', { class: 'ht-notice__text' }, message),
+            actions.length ? h('div', { class: 'ht-notice__actions' }, actions) : null
+          )
+        )
+      );
+    }
+
+    function renderProgress(category) {
+      const current = STEP_INDEX[category] != null ? STEP_INDEX[category] : 0;
+      return h('ol', { class: 'ht-progress', 'aria-label': 'Shipment progress' },
+        STEPS.map((label, i) =>
+          h('li', {
+            class: 'ht-step' + (i <= current ? ' is-done' : '') + (i === current ? ' is-current' : ''),
+            'aria-current': i === current ? 'step' : null,
+          }, i === 2 && category === 'pickup' ? 'Ready for pickup' : label)
+        )
+      );
+    }
+
+    function renderFacts(data, category) {
+      const facts = [];
+      const eta = category !== 'delivered' ? formatEta(data.estimatedDelivery) : '';
+      if (eta) facts.push(['Estimated delivery', eta]);
+      if (data.destination && data.destination.country) facts.push(['Destination', data.destination.country]);
+      if (data.origin && data.origin.country) facts.push(['Ships from', data.origin.country]);
+      const lastMile = data.carriers && data.carriers.lastMile;
+      if (lastMile && lastMile.name) {
+        facts.push(['Delivery carrier', lastMile.url
+          ? h('a', { href: lastMile.url, target: '_blank', rel: 'noopener noreferrer' }, lastMile.name)
+          : lastMile.name]);
+        if (lastMile.trackingNumber && lastMile.trackingNumber !== data.trackingNumber) {
+          facts.push(['Carrier tracking number', lastMile.trackingNumber]);
+        }
+      }
+      if (!facts.length) return null;
+      return h('dl', { class: 'ht-facts' }, facts.map(([label, value]) => h('div', { class: 'ht-fact' }, h('dt', null, label), h('dd', null, value))));
+    }
+
+    function copyButton(text) {
+      const btn = h('button', { type: 'button', class: 'ht-copy', 'aria-label': 'Copy tracking number' }, 'Copy');
+      btn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(text);
+          btn.textContent = 'Copied';
+        } catch (e) {
+          btn.textContent = 'Press and hold to copy';
+        }
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1800);
+      });
+      return btn;
+    }
+
+    function renderTimeline(events, category) {
+      const section = h('section', { class: 'ht-history', 'data-tone': category, 'aria-labelledby': 'HtHistoryTitle' },
+        h('h2', { class: 'ht-history__title', id: 'HtHistoryTitle' }, 'Shipment history'),
+        h('p', { class: 'ht-history__sub' }, events.length ? plural(events.length, 'update') + ', newest first' : 'Updates appear once the carrier scans your parcel.')
+      );
+      if (!events.length) return section;
+
+      // Group by day, newest first
+      const groups = [];
+      events.forEach((event, i) => {
+        const key = dayKey(event);
+        let group = groups[groups.length - 1];
+        if (!group || group.key !== key) {
+          group = { key, items: [] };
+          groups.push(group);
+        }
+        group.items.push({ event, index: i });
+      });
+
+      const allRows = [];
+      groups.forEach((group) => {
+        const list = h('ol', { class: 'ht-events' });
+        const wrapper = h('li', { class: 'ht-day-group' },
+          h('p', { class: 'ht-day__label' }, dayLabel(group.key)),
+          list
+        );
+        group.items.forEach(({ event, index }, j) => {
+          const row = h('li', {
+            class: 'ht-event' + (index === 0 ? ' is-latest' : '') + (j === group.items.length - 1 ? ' is-last' : ''),
+            'data-category': event.category,
+          },
+            h('span', { class: 'ht-event__icon', svg: iconFor(event.category) }),
+            h('div', { class: 'ht-event__body' },
+              h('p', { class: 'ht-event__desc' }, event.description),
+              event.location || event.carrier
+                ? h('p', { class: 'ht-event__where' }, [event.location, event.carrier].filter(Boolean).join(', '))
+                : null
+            ),
+            h('time', { class: 'ht-event__time', datetime: event.timestamp || event.date }, clock(event))
+          );
+          list.append(row);
+          allRows.push({ row, wrapper, index });
+        });
+        section.append(h('ul', { class: 'ht-day' }, wrapper));
+      });
+
+      if (events.length > VISIBLE_EVENTS) {
+        const apply = (expanded) => {
+          const visibleGroups = new Set();
+          allRows.forEach(({ row, wrapper, index }) => {
+            const show = expanded || index < VISIBLE_EVENTS;
+            row.classList.toggle('ht-hidden', !show);
+            if (show) visibleGroups.add(wrapper);
+          });
+          allRows.forEach(({ wrapper }) => wrapper.classList.toggle('ht-hidden', !visibleGroups.has(wrapper)));
+        };
+        const label = 'Show all ' + events.length + ' updates';
+        const more = h('button', { type: 'button', class: 'ht-more', 'aria-expanded': 'false' }, label);
+        more.addEventListener('click', () => {
+          const expanded = more.getAttribute('aria-expanded') !== 'true';
+          apply(expanded);
+          more.setAttribute('aria-expanded', String(expanded));
+          more.textContent = expanded ? 'Show fewer updates' : label;
+        });
+        apply(false);
+        section.append(more);
+      }
+      return section;
+    }
+
+    function renderResult(data) {
+      const category = (data.status && data.status.category) || 'unknown';
+      const events = Array.isArray(data.events) ? data.events : [];
+      const latest = events[0];
+      const label = (data.status && data.status.label) || LABELS[category] || LABELS.unknown;
+      const description = (latest && latest.description) || (data.status && data.status.description) || '';
+      const when = latest ? fullWhen(latest) : '';
+      const journey = journeyText(events, category);
+
+      const nodes = [];
+      if (data.stale) {
+        nodes.push(
+          h('div', { class: 'ht-notice', 'data-tone': 'unknown', role: 'status' },
+            h('span', { class: 'ht-notice__icon', svg: ICONS.alert }),
+            h('div', null, h('p', { class: 'ht-notice__text' }, 'Live tracking is briefly unavailable, so these are the most recent updates we have.'))
+          )
+        );
+      }
+
+      nodes.push(
+        h('section', { class: 'ht-card', 'data-tone': category, 'aria-label': 'Current status' },
+          h('div', { class: 'ht-hero' },
+            h('div', { class: 'ht-hero__row' },
+              h('span', { class: 'ht-hero__icon', svg: iconFor(category) }),
+              h('div', null,
+                h('p', { class: 'ht-hero__status' }, label),
+                journey ? h('p', { class: 'ht-hero__days' }, journey) : null
+              )
+            ),
+            description && description.toLowerCase() !== label.toLowerCase() ? h('p', { class: 'ht-hero__desc' }, description) : null,
+            when ? h('p', { class: 'ht-hero__when' }, when + (latest && latest.location ? ' in ' + latest.location : '')) : null,
+            h('div', { class: 'ht-number' },
+              h('div', { style: 'min-width:0' },
+                h('span', { class: 'ht-number__label' }, 'Tracking number'),
+                h('span', { class: 'ht-number__value' }, data.trackingNumber)
+              ),
+              copyButton(data.trackingNumber)
+            )
+          ),
+          renderProgress(category),
+          renderFacts(data, category)
+        )
+      );
+      nodes.push(renderTimeline(events, category));
+
+      result.replaceChildren(h('div', { class: 'ht-reveal' }, nodes));
+      if (result.getBoundingClientRect().top > window.innerHeight * 0.55) {
+        result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      result.focus({ preventScroll: true });
+    }
+
+    // ───────── Request ─────────
+    const normalize = (value) => String(value || '').replace(/[\s-]/g, '').toUpperCase();
+
+    function updateUrl(number) {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tracking_number', number);
+        window.history.replaceState(null, '', url);
+      } catch (e) { /* non-critical */ }
+    }
+
+    async function track(rawValue) {
+      const number = normalize(rawValue);
+      if (!NUMBER_RE.test(number)) {
+        showFieldError('Enter a valid tracking number: 8 to 40 letters and numbers.');
+        return;
+      }
+      clearFieldError();
+      input.value = number;
+      syncClear();
+      input.blur(); // close the phone keyboard so the result is visible
+      lastNumber = number;
+
+      const requestId = ++requestCounter;
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+      setLoading(true);
+      renderSkeleton();
+
+      try {
+        const response = await fetch(ENDPOINT + '?tracking_number=' + encodeURIComponent(number), {
+          method: 'GET',
+          headers: { Accept: 'application/json' },
+          credentials: 'same-origin',
+          signal: controller.signal,
+        });
+        const type = response.headers.get('content-type') || '';
+        const data = type.includes('application/json') ? await response.json() : null;
+        if (requestId !== requestCounter) return;
+
+        if (!data) {
+          renderError({ code: 'BAD_RESPONSE', message: 'Tracking is temporarily unavailable. Try again in a few minutes.' });
+          return;
+        }
+        if (!data.ok) {
+          renderError(data.error);
+          return;
+        }
+        renderResult(data);
+        updateUrl(number);
+        saveRecent(number);
+      } catch (err) {
+        if (requestId !== requestCounter) return;
+        const timedOut = err && err.name === 'AbortError';
+        renderError({
+          code: timedOut ? 'TIMEOUT' : 'NETWORK',
+          message: timedOut
+            ? 'This is taking longer than usual. Try again in a moment.'
+            : 'The tracking service couldn’t be reached. Check your connection and try again.',
+        });
+      } finally {
+        clearTimeout(timer);
+        if (requestId === requestCounter) setLoading(false);
+      }
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      track(input.value);
+    });
+    input.addEventListener('input', () => {
+      syncClear();
+      if (!fieldError.hidden) clearFieldError();
+    });
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      syncClear();
+      clearFieldError();
+      input.focus();
+    });
+
+    renderRecent();
+    const params = new URLSearchParams(window.location.search);
+    const preset = params.get('tracking_number') || params.get('t');
+    if (preset) {
+      input.value = normalize(preset);
+      syncClear();
+      track(preset);
+    }
+  })();
+</script>

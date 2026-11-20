@@ -1,0 +1,37 @@
+{%- comment -%}
+  Healtence Scroll to Top Button - Sleek Chevron (Excluded on PDP to prevent ATC button overlap)
+{%- endcomment -%}
+{%- unless template contains 'product' or request.page_type == 'product' -%}
+<button id="hwScrollToTop" class="hw-scroll-top-btn bfcm-scroll-top-btn" aria-label="Scroll to top" type="button">
+  <svg class="hw-arrow-indicator" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
+
+<script>
+  (function() {
+    function initScrollToTop() {
+      var btn = document.getElementById('hwScrollToTop');
+      if (!btn) return;
+      function checkScroll() {
+        if (window.scrollY > 300) {
+          btn.classList.add('is-visible');
+        } else {
+          btn.classList.remove('is-visible');
+        }
+      }
+      window.addEventListener('scroll', checkScroll, { passive: true });
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      checkScroll();
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initScrollToTop);
+    } else {
+      initScrollToTop();
+    }
+  })();
+</script>
+{%- endunless -%}

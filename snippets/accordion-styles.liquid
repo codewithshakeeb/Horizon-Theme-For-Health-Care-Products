@@ -1,0 +1,128 @@
+{%- doc -%}
+  Styles for the accordion and accordion row components. Extracted into a
+  snippet so that blocks which use accordion markup without nesting inside an
+  accordion block (e.g. disclosures) can include these styles independently,
+  ensuring they are sent to the client when CSS subsetting is enabled.
+{%- enddoc -%}
+
+{% stylesheet %}
+  .accordion {
+    flex: 1;
+    width: 100%;
+    --color-border: rgba(27, 74, 18, 0.12);
+  }
+
+  .accordion accordion-custom {
+    display: block;
+    margin: 0 0 4px 0;
+  }
+
+  .accordion .details {
+    border: none;
+    border-bottom: 1px solid rgba(27, 74, 18, 0.12);
+    margin: 0 0 4px 0;
+    border-radius: 0;
+    transition: background-color 0.25s ease, border-color 0.25s ease, border-radius 0.25s ease;
+  }
+
+  .accordion accordion-custom:first-child .details {
+    border-top: 1px solid rgba(27, 74, 18, 0.12);
+  }
+
+  .accordion .details[open] {
+    border: 1px solid rgba(27, 74, 18, 0.18);
+    border-radius: 12px;
+    background-color: #FAFCF9;
+    margin: 6px 0;
+  }
+
+  .accordion--caret .icon-plus,
+  .accordion--plus .icon-caret {
+    display: none;
+  }
+
+  /* Accordion header */
+  .accordion .details__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 14px;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 10px;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    min-height: 44px;
+  }
+
+  .accordion .details__header:hover {
+    background-color: rgba(220, 230, 218, 0.35);
+  }
+
+  .accordion .details[open] .details__header {
+    background-color: rgba(220, 230, 218, 0.5);
+    color: #1B4A12;
+  }
+
+  .details__header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .details__icon-wrapper {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 8px;
+    background: #EBF1EA;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color 0.25s ease;
+  }
+
+  .details__header:hover .details__icon-wrapper,
+  .details[open] .details__header .details__icon-wrapper {
+    background: #DCE6DA;
+  }
+
+  .details__icon-wrapper .details__icon {
+    width: 20px;
+    height: 20px;
+    color: #1B4A12;
+    fill: currentColor;
+    margin: 0;
+  }
+
+  .details__header-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1c1c1c;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+    transition: color 0.25s ease;
+  }
+
+  .accordion .details[open] .details__header-title {
+    color: #1B4A12;
+  }
+
+  .accordion .icon-caret {
+    color: #1B4A12;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .accordion .details[open] .icon-caret {
+    transform: rotate(180deg);
+  }
+
+  .accordion .details-content {
+    padding: 12px 14px 18px 14px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #4A5568;
+  }
+{% endstylesheet %}

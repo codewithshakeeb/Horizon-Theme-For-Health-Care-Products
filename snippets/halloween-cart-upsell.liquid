@@ -1,0 +1,73 @@
+{%- assign current_time = 'now' | date: '%s' | plus: 0 -%}
+{%- assign end_time = settings.halloween_end_date | default: '2026-11-30T23:59:59' | date: '%s' | plus: 0 -%}
+{%- assign halloween_active = false -%}
+{%- if settings.halloween_enabled and current_time <= end_time -%}
+  {%- assign halloween_active = true -%}
+{%- endif -%}
+
+{%- if halloween_active and cart.item_count > 0 -%}
+  {%- assign cart_product_ids = cart.items | map: 'product_id' -%}
+  {%- assign upsell_products = '' | split: '' -%}
+  
+  {%- for p in collections.all.products -%}
+    {%- unless cart_product_ids contains p.id -%}
+      {%- if p.available -%}
+        {%- assign upsell_products = upsell_products | concat: p | slice: 0, 2 -%}
+      {%- endif -%}
+    {%- endunless -%}
+    {%- if upsell_products.size >= 2 -%}{%- break -%}{%- endif -%}
+  {%- endfor -%}
+
+  {%- if upsell_products.size > 0 -%}
+    <div class="hw-cart-upsell-section bfcm-cart-upsell-section" id="hwCartUpsellSection">
+      <div class="hw-cart-upsell-header">
+        <span class="hw-cart-upsell-icon" aria-hidden="true">🔥</span>
+        <span class="hw-cart-upsell-title">Black Friday VIP Exclusives — Add & Save:</span>
+      </div>
+
+      <div class="hw-cart-upsell-items">
+        {%- for prod in upsell_products -%}
+          {%- assign up_variant = prod.selected_or_first_available_variant -%}
+          <div class="hw-cart-upsell-item" data-product-id="{{ prod.id }}">
+            <div class="hw-cart-upsell-thumb-wrap">
+              {%- if prod.featured_image -%}
+                <img 
+                  src="{{ prod.featured_image | image_url: width: 120 }}" 
+                  alt="{{ prod.title | escape }}" 
+                  loading="lazy" 
+                  class="hw-cart-upsell-thumb"
+                  width="50"
+                  height="50"
+                >
+              {%- else -%}
+                <span class="hw-cart-upsell-placeholder">🌿</span>
+              {%- endif -%}
+            </div>
+
+            <div class="hw-cart-upsell-info">
+              <span class="hw-cart-upsell-name" title="{{ prod.title | escape }}">
+                {{ prod.title | truncate: 28 }}
+              </span>
+              <div class="hw-cart-upsell-prices">
+                <span class="hw-cart-upsell-price">{{ up_variant.price | money }}</span>
+                {%- if up_variant.compare_at_price > up_variant.price -%}
+                  <s class="hw-cart-upsell-compare">{{ up_variant.compare_at_price | money }}</s>
+                {%- endif -%}
+              </div>
+            </div>
+
+            <button 
+              type="button" 
+              class="hw-cart-upsell-add-btn" 
+              data-variant-id="{{ up_variant.id }}"
+              onclick="window.hwAddUpsellToCart({{ up_variant.id }}, this)"
+              aria-label="Add {{ prod.title | escape }} to cart"
+            >
+              <span>+ Add</span>
+            </button>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+{%- endif -%}

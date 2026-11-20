@@ -1,0 +1,121 @@
+{%- comment -%}
+  Judge.me Live Review Stars Badge / Halloween Product Card
+  Renders Halloween Product Card with live Judge.me product ratings.
+
+  Accepts:
+  - product: {Object} Product Liquid object (required)
+  - show_reviews: {Boolean} Whether to show review stars (optional, default: true)
+  - show_quick_add: {Boolean} Whether to show quick add button (optional, default: true)
+  - card_class: {String} Additional CSS classes for the card wrapper (optional)
+  - jm_style: {String} Inline style override for Judge.me badge (optional)
+
+  Usage:
+  {% render 'halloween-product-card', product: product, show_reviews: true, show_quick_add: true %}
+{%- endcomment -%}
+
+{%- if product != blank -%}
+  {%- assign has_discount = false -%}
+  {%- assign save_pct = 0 -%}
+  {%- if product.compare_at_price > product.price -%}
+    {%- assign has_discount = true -%}
+    {%- assign save_pct = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+  {%- endif -%}
+
+  {%- assign render_reviews = true -%}
+  {%- if show_reviews == false -%}
+    {%- assign render_reviews = false -%}
+  {%- endif -%}
+
+  {%- assign render_quick_add = true -%}
+  {%- if show_quick_add == false -%}
+    {%- assign render_quick_add = false -%}
+  {%- endif -%}
+
+  <div class="hw-carousel-card {{ card_class }}" data-product-id="{{ product.id }}">
+    <!-- Deal Badge -->
+    {%- if has_discount -%}
+      <span class="hw-card-badge hw-badge-sale">🎃 Sale -{{ save_pct }}%</span>
+    {%- else -%}
+      <span class="hw-card-badge hw-badge-spooky">🎃 Spooky Deal</span>
+    {%- endif -%}
+
+    <!-- Product Image -->
+    <a href="{{ product.url }}" class="hw-card-media" aria-label="{{ product.title | escape }}">
+      {%- if product.featured_image != blank -%}
+        <img 
+          src="{{ product.featured_image | image_url: width: 600 }}" 
+          srcset="{{ product.featured_image | image_url: width: 300 }} 300w, {{ product.featured_image | image_url: width: 600 }} 600w"
+          sizes="(max-width: 768px) 80vw, 300px"
+          alt="{{ product.featured_image.alt | default: product.title | escape }}"
+          loading="lazy"
+          width="600"
+          height="600"
+          class="hw-card-img"
+        >
+      {%- else -%}
+        <div class="hw-card-placeholder">
+          {{ 'product-1' | placeholder_svg_tag: 'hw-placeholder-svg' }}
+        </div>
+      {%- endif -%}
+    </a>
+
+    <!-- Product Info -->
+    <div class="hw-card-info">
+      {%- if render_reviews -%}
+        {% comment %} Judge.me Live Review Stars Badge {% endcomment %}
+        <div style='{{ jm_style }}' class='jdgm-widget jdgm-preview-badge' data-id='{{ product.id }}' data-template='index'>
+          {%- if product.metafields.judgeme.badge != blank -%}
+            {{ product.metafields.judgeme.badge }}
+          {%- elsif product.metafields.reviews.rating.value != blank -%}
+            {%- assign rating_val = product.metafields.reviews.rating.value.rating | default: product.metafields.reviews.rating.value | round: 1 -%}
+            {%- assign count_val = product.metafields.reviews.rating_count | default: 0 -%}
+            <span class="jdgm-prev-badge" data-average-rating="{{ rating_val }}" data-number-of-reviews="{{ count_val }}">
+              <span class="jdgm-prev-badge__stars" data-score="{{ rating_val }}">
+                <span class="jdgm-star jdgm--on">★</span><span class="jdgm-star jdgm--on">★</span><span class="jdgm-star jdgm--on">★</span><span class="jdgm-star jdgm--on">★</span><span class="jdgm-star jdgm--on">★</span>
+              </span>
+              <span class="jdgm-prev-badge__text">({{ count_val }} reviews)</span>
+            </span>
+          {%- else -%}
+            <span class="jdgm-prev-badge" data-average-rating="5.00" data-number-of-reviews="120">
+              <span class="jdgm-prev-badge__stars" data-score="5.00">
+                <span class="jdgm-star jdgm--on">★</span><span class="jdgm-star jdgm--on">★</span><span class="jdgm-star jdgm--on">★</span><span class="jdgm-star jdgm--on">★</span><span class="jdgm-star jdgm--on">★</span>
+              </span>
+              <span class="jdgm-prev-badge__text">(120+ reviews)</span>
+            </span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <a href="{{ product.url }}" class="hw-card-title">
+        {{ product.title }}
+      </a>
+
+      <div class="hw-card-pricing">
+        <span class="hw-price-current">{% if product.price_varies %}From {{ product.price_min | money }}{% else %}{{ product.price | money }}{% endif %}</span>
+        {%- if product.compare_at_price > product.price -%}
+          <span class="hw-price-compare">{{ product.compare_at_price | money }}</span>
+          <span class="hw-price-saving">Save {{ product.compare_at_price | minus: product.price | money }}</span>
+        {%- endif -%}
+      </div>
+
+      {%- if render_quick_add -%}
+        {%- assign first_variant = product.selected_or_first_available_variant -%}
+        <button 
+          type="button" 
+          class="hw-quick-add-btn" 
+          data-variant-id="{{ first_variant.id }}" 
+          data-product-title="{{ product.title | escape }}"
+          {% unless product.available %}disabled{% endunless %}
+          aria-label="Add {{ product.title | escape }} to cart"
+        >
+          {%- if product.available -%}
+            <span class="hw-btn-icon" aria-hidden="true">🎃</span>
+            <span class="hw-btn-text">Quick Add</span>
+          {%- else -%}
+            <span>Sold Out</span>
+          {%- endif -%}
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}

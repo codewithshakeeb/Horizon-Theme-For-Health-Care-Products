@@ -1,0 +1,34 @@
+{%- doc -%}
+  Renders a collapsible accordion row or tab for product detail pages (PDP).
+  Aligned with Healtence Horizon Design System.
+
+  @param {string} heading - Title of the accordion tab (e.g. "Description", "Shipping Policy", "Refund Policy")
+  @param {string} content - Rich HTML or text content to display
+  @param {string} [icon] - Name of icon (e.g. "clipboard", "truck", "return")
+  @param {boolean} [open_by_default] - Whether row should start expanded
+{%- enddoc -%}
+
+<div class="product__accordion accordion">
+  <accordion-custom {% if open_by_default %}open open-by-default-on-desktop open-by-default-on-mobile{% endif %}>
+    <details class="details" {% if open_by_default %}open{% endif %}>
+      <summary class="details__header">
+        <span class="details__header-left">
+          {% if icon != blank and icon != 'none' %}
+            <span class="details__icon-wrapper">
+              <svg class="details__icon icon-default" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                {% render 'icon', icon: icon %}
+              </svg>
+            </span>
+          {% endif %}
+          <span class="details__header-title accordion__title">{{ heading }}</span>
+        </span>
+        <span class="svg-wrapper icon-caret icon-animated">
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </span>
+      </summary>
+      <div class="details-content accordion__content">
+        {{ content }}
+      </div>
+    </details>
+  </accordion-custom>
+</div>

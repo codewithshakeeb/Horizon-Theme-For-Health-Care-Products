@@ -1,0 +1,232 @@
+
+{%- doc -%}
+  Renders the blog post info text block.
+
+  @param {object} [article] - The article object
+  @param {string} [alignment] - The alignment of the text. Defaults to the block's alignment setting.
+  @param {string} [author] - The author name. Defaults to article.author, placeholder text for onboarding
+  @param {string} [date] - The published date. Defaults to article.published_at, placeholder text for onboarding
+{%- enddoc -%}
+
+{% assign block_settings = block.settings %}
+{% assign alignment = alignment | default: block_settings.alignment %}
+{% assign display_author = author | default: article.author %}
+{% assign display_date = date | default: article.published_at %}
+
+{%- if block_settings.show_date or block_settings.show_author -%}
+  <div
+    class="
+      blog-post-details
+      spacing-style
+      justify-{{ alignment }}
+      {% if block_settings.type_preset != '' %}{{ block_settings.type_preset }}{% endif%}
+    "
+    style="
+      {% render 'spacing-style', settings: block_settings %}
+      {% if block_settings.text_color != blank %}
+        --color-details: {{ block_settings.text_color }};
+      {% endif %}
+    "
+  >
+    {%- if block_settings.show_date -%}
+      <span>{{- display_date | time_tag: format: 'date' -}}</span>
+    {%- endif -%}
+
+    {%- if block_settings.show_date and block_settings.show_author -%}
+      <span>{{ 'content.blog_details_separator' | t }}</span>
+    {%- endif -%}
+
+    {%- if block_settings.show_author -%}
+      <span>{{ display_author }}</span>
+    {%- endif -%}
+  </div>
+{% endif %}
+
+{%- if template.name == 'article' -%}
+  {%- assign reviewer_name = article.metafields.custom.reviewer_name.value | default: article.metafields.custom.reviewer_name | strip -%}
+  {%- assign reviewer_credentials = article.metafields.custom.reviewer_credentials.value | default: article.metafields.custom.reviewer_credentials | strip -%}
+  {%- assign reviewer_url = article.metafields.custom.reviewer_url.value | default: article.metafields.custom.reviewer_url | strip -%}
+  {%- assign reviewed_date = article.metafields.custom.reviewed_date.value | default: article.metafields.custom.reviewed_date | strip -%}
+
+  {%- if reviewer_name != blank -%}
+    <div class="article-reviewer-byline" style="display: inline-flex; align-items: center; gap: 8px; margin: 0 auto; padding: 6px 14px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 9999px; font-size: 0.85rem; color: #475569;">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="color: #1B4A12; flex-shrink: 0;">
+        <path d="M10 2L12.39 4.87L16.18 4.41L17.15 8.1L20 10.45L18.09 13.73L18.42 17.53L14.66 18.25L12.72 21.55L10 18.9L7.28 21.55L5.34 18.25L1.58 17.53L1.91 13.73L0 10.45L2.85 8.1L3.82 4.41L7.61 4.87L10 2Z" fill="#1B4A12"/>
+        <path d="M6 10.5L8.5 13L14 7.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>
+        <strong>Reviewed by </strong>
+        {%- if reviewer_url != blank -%}
+          <a href="{{ reviewer_url }}" target="_blank" rel="noopener noreferrer" style="color: #1B4A12; text-decoration: underline; font-weight: 600;">{{ reviewer_name }}</a>
+        {%- else -%}
+          <span style="color: #1E293B; font-weight: 600;">{{ reviewer_name }}</span>
+        {%- endif -%}
+        {%- if reviewer_credentials != blank -%}, <span class="reviewer-credentials">{{ reviewer_credentials }}</span>{%- endif -%}
+        {%- if reviewed_date != blank -%} &bull; <time datetime="{{ reviewed_date }}">{{ reviewed_date }}</time>{%- endif -%}
+      </span>
+    </div>
+  {%- endif -%}
+{%- endif -%}
+
+{% stylesheet %}
+  .blog-post-details {
+    display: flex;
+    gap: var(--gap-sm);
+    font-size: var(--font-paragraph-size);
+    color: var(--color-details, var(--color-foreground-muted));
+    white-space: nowrap;
+    flex-wrap: wrap;
+  }
+
+  .blog-post-details > span {
+    text-overflow: clip;
+    overflow: hidden;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.details",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "t:settings.show_date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "t:settings.show_author",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:content.typography"
+    },
+    {
+      "type": "select",
+      "id": "type_preset",
+      "label": "t:settings.preset",
+      "options": [
+        {
+          "value": "",
+          "label": "t:options.default"
+        },
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        }
+      ],
+      "default": "",
+      "info": "t:info.edit_presets_in_theme_settings"
+    },
+    {
+      "type": "text_alignment",
+      "id": "alignment",
+      "label": "t:settings.alignment",
+      "visible_if": "{{ block.settings.show_alignment != false }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:settings.text_color",
+      "placeholder": "t:settings.default"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_alignment",
+      "label": "t:settings.show_alignment",
+      "default": true,
+      "visible_if": "{{ false }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.details",
+      "category": "t:categories.blog_post",
+      "settings": {
+        "show_date": true,
+        "show_author": false,
+        "type_preset": "",
+        "alignment": "center",
+        "show_alignment": true,
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    }
+  ]
+}
+{% endschema %}

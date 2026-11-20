@@ -1,0 +1,343 @@
+<!doctype html>
+<html
+  {% if request.design_mode %}
+    class="shopify-design-mode"
+  {% endif %}
+  lang="{{ request.locale.iso_code }}"
+  dir="{{ request.locale.direction | default: 'ltr' }}"
+>
+  <head>
+    <style id="hw-viewport-overflow-lock">
+      /* Mobile Horizontal Overflow Lock (Never locks Y scroll) */
+      @media screen and (max-width: 989px) {
+        html, body {
+          overflow-x: hidden !important;
+          overflow-y: auto !important;
+          position: relative !important;
+          width: 100% !important;
+          max-width: 100vw !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        .page-wrapper, #MainContent, main, .content-for-layout {
+          overflow-x: clip !important;
+          max-width: 100vw !important;
+          width: 100% !important;
+          box-sizing: border-box !important;
+        }
+      }
+
+      /* Desktop: Guarantee Native Horizon Page-Wrapper Vertical Scrolling */
+      @media screen and (min-width: 990px) {
+        .page-wrapper {
+          height: 100dvh !important;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+        }
+      }
+      @media screen and (max-width: 749px) {
+        #header-component[data-menu-style='drawer'] .header__columns {
+          grid-column: 1 / -1 !important;
+          width: 100% !important;
+          max-width: 100vw !important;
+          box-sizing: border-box !important;
+          padding-inline: 12px !important;
+        }
+        .header__row {
+          max-width: 100vw !important;
+          overflow-x: hidden !important;
+          box-sizing: border-box !important;
+        }
+        .menu-drawer {
+          width: 100vw !important;
+          max-width: 100vw !important;
+          inset: 0 !important;
+          top: 0 !important;
+          bottom: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          height: 100dvh !important;
+          z-index: 2147483647 !important;
+        }
+        details:not([open]):not(.menu-open) > .menu-drawer,
+        details:not([open]):not(.menu-open) > .menu-drawer__backdrop {
+          display: none !important;
+          visibility: hidden !important;
+          pointer-events: none !important;
+        }
+        body:has(#Details-menu-drawer-container[open]) .hw-announcement-bar,
+        body.mobile-menu-is-open .hw-announcement-bar {
+          display: none !important;
+        }
+      }
+    </style>
+    {%- if settings.favicon != blank -%}
+      <link
+        rel="icon"
+        type="image/png"
+        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
+      >
+    {%- endif -%}
+
+    {%- render 'view-transition-opt-in' -%}
+
+    {%- render 'meta-tags' -%}
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.shopify.com">
+    {%- assign should_noindex = false -%}
+    {%- if template.name == 'collection' -%}
+      {%- if collection.handle == 'frontpage' or collection.handle == 'featured-products' or collection.handle == 'sale' or collection.products_count == 0 -%}
+        {%- assign should_noindex = true -%}
+      {%- endif -%}
+    {%- elsif template.name == 'blog' and blog.articles_count == 0 -%}
+      {%- assign should_noindex = true -%}
+    {%- elsif template.name == 'page' -%}
+      {%- if page.handle == 'track' or page.handle == 'landing-page' -%}
+        {%- assign should_noindex = true -%}
+      {%- endif -%}
+    {%- endif -%}
+    {%- if should_noindex -%}
+      <meta name="robots" content="noindex, follow">
+    {%- endif -%}
+    {%- if template.name == 'index' -%}
+      {%- assign home_lcp_image = images['Redesign_the_attached_reference_banner_b9b1c060_2K.jpg'] -%}
+      {%- if home_lcp_image != blank -%}
+        <link
+          rel="preload"
+          as="image"
+          href="{{ home_lcp_image | image_url: width: 1100 }}"
+          imagesrcset="{{ home_lcp_image | image_url: width: 360 }} 360w, {{ home_lcp_image | image_url: width: 540 }} 540w, {{ home_lcp_image | image_url: width: 720 }} 720w, {{ home_lcp_image | image_url: width: 900 }} 900w, {{ home_lcp_image | image_url: width: 1100 }} 1100w, {{ home_lcp_image | image_url: width: 1500 }} 1500w"
+          imagesizes="100vw"
+          fetchpriority="high"
+        >
+      {%- endif -%}
+    {%- elsif template.name == 'product' -%}
+      {%- assign lcp_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media | default: product.media.first -%}
+      {%- assign lcp_image = lcp_media.preview_image | default: lcp_media | default: product.featured_image -%}
+      {%- if lcp_image != blank -%}
+        <link
+          rel="preload"
+          as="image"
+          href="{{ lcp_image | image_url: width: 900 }}"
+          imagesrcset="{{ lcp_image | image_url: width: 360 }} 360w, {{ lcp_image | image_url: width: 540 }} 540w, {{ lcp_image | image_url: width: 750 }} 750w, {{ lcp_image | image_url: width: 900 }} 900w, {{ lcp_image | image_url: width: 1200 }} 1200w"
+          imagesizes="(min-width: 750px) 50vw, 100vw"
+          fetchpriority="high"
+        >
+      {%- endif -%}
+    {%- endif -%}
+    {%- render 'stylesheets' -%}
+    {%- render 'card-hover-effect-styles' -%}
+    {%- render 'fonts' -%}
+    {%- render 'scripts' -%}
+    {%- render 'theme-styles-variables' -%}
+    {%- render 'color-palette' -%}
+
+    {%- assign current_time = 'now' | date: '%s' | plus: 0 -%}
+    {%- assign end_time = settings.halloween_end_date | default: '2026-11-30T23:59:59' | date: '%s' | plus: 0 -%}
+    {%- assign halloween_active = false -%}
+    {%- if settings.halloween_enabled and current_time <= end_time -%}
+      {%- assign halloween_active = true -%}
+    {%- endif -%}
+
+    {%- if halloween_active -%}
+      <!-- bfcm:active -->
+      {%- render 'halloween-config' -%}
+      {{ 'halloween-styles.css' | asset_url | stylesheet_tag }}
+      <script>
+        (function(){
+          var loaded = false;
+          var urls = [{{ 'halloween-countdown.js' | asset_url | json }}, {{ 'halloween-cart.js' | asset_url | json }}];
+          function loadScripts() {
+            if (loaded) return;
+            loaded = true;
+            ['scroll','mousemove','touchstart','pointerdown','keydown'].forEach(function(e){ window.removeEventListener(e, loadScripts); });
+            urls.forEach(function(u){ var s = document.createElement('script'); s.src = u; s.defer = true; document.head.appendChild(s); });
+          }
+          ['scroll','mousemove','touchstart','pointerdown','keydown'].forEach(function(e){ window.addEventListener(e, loadScripts, { once: true, passive: true }); });
+          window.addEventListener('load', function(){ setTimeout(loadScripts, 4500); }, { once: true });
+        })();
+      </script>
+    {%- else -%}
+      {%- render 'halloween-config' -%}
+    {%- endif -%}
+
+    {%- render 'bfcm-schema-aeo' -%}
+
+    {% if request.design_mode %}
+      {%- render 'theme-editor' -%}
+    {% endif %}
+
+    {{ content_for_header }}
+  </head>
+
+  <body class="template-{{ template.name | handle }} page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}">
+    {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+
+    {% render 'chat-drawer' %}
+
+    <div class="page-wrapper">
+      <div id="header-group">
+        {% sections 'header-group' %}
+      </div>
+
+      <script>
+        /**
+         * Sets `--header-height` and `--header-group-height` to measured values before first paint.
+         *
+         * A few CSS rules position content relative to the header at first paint — a hero sized to
+         * the remaining viewport, a transparent header's negative margin. Without a measured value
+         * those rules use the `60px` fallback from `sections/header.liquid`, and the content visibly
+         * jumps once `header.js` corrects the values after load.
+         *
+         * Measuring forces layout mid-parse, so it only runs where a consuming rule exists.
+         * Callers opt in: the transparent-header branch below, or `snippets/measure-header-heights.liquid`,
+         * which any new first-paint consumer must render too.
+         *
+         * Measures once per page; after load, header.js's ResizeObservers keep the values fresh.
+         * The group-height walk mimics calculateHeaderGroupHeight() in utilities.js — keep them
+         * in sync.
+         */
+        window.measureHeaderHeights = (function () {
+          let measured = false;
+
+          return function measureHeaderHeights() {
+            if (measured) return;
+
+            const header = document.querySelector('#header-component');
+            const headerGroup = document.querySelector('#header-group');
+
+            if (!header || !headerGroup) return;
+            measured = true;
+
+            const headerHeight = header.offsetHeight;
+
+            let headerGroupHeight = 0;
+            for (const element of headerGroup.children) {
+              if (element instanceof HTMLElement) headerGroupHeight += element.offsetHeight;
+            }
+
+            /**
+             * A transparent header is absolutely positioned, so the loop above counts its section
+             * wrapper as 0px. When a section follows it in the group, header.liquid pushes that
+             * section down by the header's height using a margin, which offsetHeight also
+             * excludes — so the header's height has to be added back manually.
+             */
+            if (header.hasAttribute('transparent') && header.parentElement?.nextElementSibling) {
+              headerGroupHeight += headerHeight;
+            }
+
+            document.body.style.setProperty('--header-height', `${headerHeight}px`);
+            document.body.style.setProperty('--header-group-height', `${headerGroupHeight}px`);
+          };
+        })();
+
+        /**
+         * Transparent-header rules consume the measured heights at first paint on every
+         * template, so the transparent case opts in globally here instead of per-section.
+         */
+        if (document.querySelector('#header-component')?.hasAttribute('transparent')) {
+          measureHeaderHeights();
+        }
+
+        /**
+         * Sets `--top-row-height`, consumed by the header underlays and submenus. Deferred to a
+         * rAF so the height read doesn't force layout mid-parse, and scoped to the
+         * header, where all consumers live, so the write only invalidates the header subtree.
+         * Mimics the `--top-row-height` write in updateHeaderHeights() in utilities.js
+         */
+        (function setTopRowHeight() {
+          const header = document.querySelector('#header-component');
+          const headerTopRow = header?.querySelector('.header__row--top');
+          if (!headerTopRow) return;
+
+          window.requestAnimationFrame(function () {
+            header.style.setProperty('--top-row-height', `${headerTopRow.getBoundingClientRect().height}px`);
+          });
+        })();
+
+        /**
+         * Sets `--transparent-header-offset-boolean` when the first section must offset itself
+         * under a transparent header. The non-offset case relies on the `0` default declared in
+         * sections/header.liquid — unlike updateTransparentHeaderOffset() in utilities.js, which
+         * re-runs on editor changes and must write '0' to reset a previously written '1'.
+         */
+        (function updateTransparentHeaderOffset() {
+          const header = document.querySelector('#header-component');
+          const headerSection = document.querySelector('#header-group .header-section');
+          if (!headerSection || !header?.hasAttribute('transparent')) return;
+
+          const hasImmediateSection = headerSection.nextElementSibling?.classList.contains('shopify-section');
+          if (!hasImmediateSection) {
+            document.body.style.setProperty('--transparent-header-offset-boolean', '1');
+          }
+        })();
+
+        /**
+         * Sets the initial menu style (inline menu vs. drawer) on the header component.
+         * Mimics setHeaderMenuStyle() in utilities.js
+         */
+        (function setHeaderMenuStyle() {
+          const headerComponent = document.querySelector('#header-component');
+          if (headerComponent) {
+            const isTouchDevice = 'ontouchstart' in window && navigator.maxTouchPoints > 0;
+            const overflowList = headerComponent.querySelector('overflow-list');
+            const hasReachedMinimum = overflowList && overflowList.hasAttribute('minimum-reached');
+            headerComponent.dataset.menuStyle = isTouchDevice || hasReachedMinimum ? 'drawer' : 'menu';
+          }
+        })();
+      </script>
+
+      <main
+        id="MainContent"
+        class="content-for-layout"
+        role="main"
+        data-page-transition-enabled="{{ settings.page_transition_enabled }}"
+        data-product-transition="{{ settings.transition_to_main_product }}"
+        data-template="{{ template }}"
+      >
+        {{ content_for_layout }}
+      </main>
+
+      <footer>
+        {% sections 'footer-group' %}
+      </footer>
+    </div>
+
+    {% render 'cart-drawer', render_wrapper: true %}
+    {% render 'theme-drawer' %}
+
+    {% render 'search-modal' %}
+
+    {% if settings.quick_add or settings.mobile_quick_add %}
+      {% render 'quick-add-modal' %}
+    {% endif %}
+
+    {%- if halloween_active -%}
+      {% render 'scroll-to-top' %}
+      {% render 'halloween-sticky-bar' %}
+      {% render 'halloween-social-proof' %}
+    {%- endif -%}
+
+    <script>
+      (function() {
+        var loaded = false;
+        function loadDeferredWidgets() {
+          if (loaded) return;
+          loaded = true;
+          window.removeEventListener('scroll', loadDeferredWidgets, { passive: true });
+          window.removeEventListener('touchstart', loadDeferredWidgets, { passive: true });
+          window.removeEventListener('mousemove', loadDeferredWidgets, { passive: true });
+          window.removeEventListener('keydown', loadDeferredWidgets, { passive: true });
+          if (window.jdgm && typeof window.jdgm.triggerScriptLoad === 'function') {
+            window.jdgm.triggerScriptLoad();
+          }
+        }
+        window.addEventListener('scroll', loadDeferredWidgets, { passive: true, once: true });
+        window.addEventListener('touchstart', loadDeferredWidgets, { passive: true, once: true });
+        window.addEventListener('mousemove', loadDeferredWidgets, { passive: true, once: true });
+        window.addEventListener('keydown', loadDeferredWidgets, { passive: true, once: true });
+        setTimeout(loadDeferredWidgets, 3500);
+      })();
+    </script>
+  </body>
+</html>

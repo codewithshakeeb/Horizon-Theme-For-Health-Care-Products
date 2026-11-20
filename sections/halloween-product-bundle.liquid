@@ -1,0 +1,491 @@
+{%- assign current_time = 'now' | date: '%s' | plus: 0 -%}
+{%- assign end_time = settings.halloween_end_date | default: '2026-11-30T23:59:59' | date: '%s' | plus: 0 -%}
+{%- assign halloween_active = false -%}
+{%- if settings.halloween_enabled and current_time <= end_time -%}
+  {%- assign halloween_active = true -%}
+{%- endif -%}
+
+{%- if halloween_active and product != blank -%}
+  {%- assign discount_pct = section.settings.discount_percent | default: 25 -%}
+
+  {%- comment -%} Determine Complementary Products {%- endcomment -%}
+  {%- assign item1 = section.settings.bundle_product_1 -%}
+  {%- assign item2 = section.settings.bundle_product_2 -%}
+
+  {%- if item1 == blank or item1.id == product.id or item1.available == false -%}
+    {%- assign found1 = false -%}
+    {%- for p in collections.all.products -%}
+      {%- if p.id != product.id and p.available and found1 == false -%}
+        {%- assign item1 = p -%}
+        {%- assign found1 = true -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  {%- if item2 == blank or item2.id == product.id or item2.id == item1.id or item2.available == false -%}
+    {%- assign found2 = false -%}
+    {%- for p in collections.all.products -%}
+      {%- if p.id != product.id and p.id != item1.id and p.available and found2 == false -%}
+        {%- assign item2 = p -%}
+        {%- assign found2 = true -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  {%- if item1 != blank -%}
+    <section 
+      class="hw-bundle-section frequently-bought-together page-width bfcm-bundle-section" 
+      id="hw-bundle-{{ section.id }}" 
+      aria-labelledby="hwBundleHeading-{{ section.id }}"
+      data-discount-percent="{{ discount_pct }}"
+      data-agent-landmark="bfcm-bundle"
+    >
+      <div class="hw-bundle-card bfcm-bundle-card">
+        <!-- Header -->
+        <div class="hw-bundle-header bfcm-bundle-header">
+          <div class="hw-bundle-title-group">
+            <span class="hw-bundle-pumpkin-badge" aria-hidden="true">⚡</span>
+            <div>
+              <h2 id="hwBundleHeading-{{ section.id }}" class="hw-bundle-heading">
+                {{ section.settings.heading | default: 'Black Friday Ultimate Wellness Bundle' }}
+              </h2>
+              <p class="hw-bundle-subtitle">
+                {{ section.settings.subtitle | default: 'Bundle & Save an Extra 25% — Limited Black Friday Inventory' }}
+              </p>
+            </div>
+          </div>
+          <div class="hw-bundle-deal-chip bfcm-bundle-deal-chip">
+            <span>BUNDLE & SAVE {{ discount_pct }}%</span>
+          </div>
+        </div>
+
+        <div class="hw-bundle-body hw-bundle-content">
+          <!-- Visual Items Track / Product Items Column -->
+          <div class="hw-bundle-products-list hw-bundle-items-track" id="hwBundleItemsTrack">
+            <!-- Main Product (This Item) -->
+            {%- assign v0 = product.selected_or_first_available_variant -%}
+            <div class="hw-bundle-item" data-item-index="0" data-product-id="{{ product.id }}">
+              <div class="hw-bundle-item-top">
+                <input 
+                  type="checkbox" 
+                  class="hw-bundle-checkbox" 
+                  id="hwBundleCheck-0" 
+                  checked 
+                  disabled 
+                  data-variant-id="{{ v0.id }}" 
+                  data-price="{{ v0.price }}" 
+                  data-compare="{{ v0.compare_at_price | default: v0.price }}"
+                  aria-label="Include {{ product.title | escape }} in bundle"
+                >
+                <label for="hwBundleCheck-0" class="hw-bundle-thumb-label">
+                  <div class="hw-bundle-thumb-wrap">
+                    {%- if product.featured_image -%}
+                      <img 
+                        src="{{ product.featured_image | image_url: width: 240 }}" 
+                        alt="{{ product.title | escape }}" 
+                        loading="lazy" 
+                        class="hw-bundle-thumb"
+                        width="110"
+                        height="110"
+                      >
+                    {%- else -%}
+                      <div class="hw-bundle-thumb-placeholder">🌿</div>
+                    {%- endif -%}
+                    <span class="hw-bundle-thumb-tag">This Item</span>
+                  </div>
+                </label>
+              </div>
+              <div class="hw-bundle-item-meta">
+                <span class="hw-bundle-item-title">{{ product.title | truncate: 45 }}</span>
+                <span class="hw-bundle-item-price" id="hwBundleItemPrice-0">{{ v0.price | money }}</span>
+              </div>
+            </div>
+
+            <!-- Plus Sign -->
+            <div class="hw-bundle-plus" aria-hidden="true">+</div>
+
+            <!-- Item 1 -->
+            {%- assign v1 = item1.selected_or_first_available_variant -%}
+            <div class="hw-bundle-item" data-item-index="1" data-product-id="{{ item1.id }}">
+              <div class="hw-bundle-item-top">
+                <input 
+                  type="checkbox" 
+                  class="hw-bundle-checkbox hw-bundle-interactive-check" 
+                  id="hwBundleCheck-1" 
+                  checked 
+                  data-variant-id="{{ v1.id }}" 
+                  data-price="{{ v1.price }}" 
+                  data-compare="{{ v1.compare_at_price | default: v1.price }}"
+                  aria-label="Include {{ item1.title | escape }} in bundle"
+                >
+                <label for="hwBundleCheck-1" class="hw-bundle-thumb-label">
+                  <div class="hw-bundle-thumb-wrap">
+                    {%- if item1.featured_image -%}
+                      <img 
+                        src="{{ item1.featured_image | image_url: width: 240 }}" 
+                        alt="{{ item1.title | escape }}" 
+                        loading="lazy" 
+                        class="hw-bundle-thumb"
+                        width="110"
+                        height="110"
+                      >
+                    {%- else -%}
+                      <div class="hw-bundle-thumb-placeholder">🌿</div>
+                    {%- endif -%}
+                  </div>
+                </label>
+              </div>
+              <div class="hw-bundle-item-meta">
+                <a href="{{ item1.url }}" class="hw-bundle-item-title" title="{{ item1.title | escape }}">
+                  {{ item1.title | truncate: 45 }}
+                </a>
+                {%- if item1.variants.size > 1 -%}
+                  <select class="hw-bundle-variant-select" data-item-index="1" aria-label="Select variant for {{ item1.title | escape }}">
+                    {%- for variant in item1.variants -%}
+                      {%- if variant.available -%}
+                        <option value="{{ variant.id }}" data-price="{{ variant.price }}" data-compare="{{ variant.compare_at_price | default: variant.price }}">
+                          {{ variant.title }}
+                        </option>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  </select>
+                {%- endif -%}
+                <span class="hw-bundle-item-price" id="hwBundleItemPrice-1">{{ v1.price | money }}</span>
+              </div>
+            </div>
+
+            {%- if item2 != blank -%}
+              <!-- Plus Sign -->
+              <div class="hw-bundle-plus" aria-hidden="true">+</div>
+
+              <!-- Item 2 -->
+              {%- assign v2 = item2.selected_or_first_available_variant -%}
+              <div class="hw-bundle-item" data-item-index="2" data-product-id="{{ item2.id }}">
+                <div class="hw-bundle-item-top">
+                  <input 
+                    type="checkbox" 
+                    class="hw-bundle-checkbox hw-bundle-interactive-check" 
+                    id="hwBundleCheck-2" 
+                    checked 
+                    data-variant-id="{{ v2.id }}" 
+                    data-price="{{ v2.price }}" 
+                    data-compare="{{ v2.compare_at_price | default: v2.price }}"
+                    aria-label="Include {{ item2.title | escape }} in bundle"
+                  >
+                  <label for="hwBundleCheck-2" class="hw-bundle-thumb-label">
+                    <div class="hw-bundle-thumb-wrap">
+                      {%- if item2.featured_image -%}
+                        <img 
+                          src="{{ item2.featured_image | image_url: width: 240 }}" 
+                          alt="{{ item2.title | escape }}" 
+                          loading="lazy" 
+                          class="hw-bundle-thumb"
+                          width="110"
+                          height="110"
+                        >
+                      {%- else -%}
+                        <div class="hw-bundle-thumb-placeholder">🌿</div>
+                      {%- endif -%}
+                    </div>
+                  </label>
+                </div>
+                <div class="hw-bundle-item-meta">
+                  <a href="{{ item2.url }}" class="hw-bundle-item-title" title="{{ item2.title | escape }}">
+                    {{ item2.title | truncate: 45 }}
+                  </a>
+                  {%- if item2.variants.size > 1 -%}
+                    <select class="hw-bundle-variant-select" data-item-index="2" aria-label="Select variant for {{ item2.title | escape }}">
+                      {%- for variant in item2.variants -%}
+                        {%- if variant.available -%}
+                          <option value="{{ variant.id }}" data-price="{{ variant.price }}" data-compare="{{ variant.compare_at_price | default: variant.price }}">
+                            {{ variant.title }}
+                          </option>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </select>
+                  {%- endif -%}
+                  <span class="hw-bundle-item-price" id="hwBundleItemPrice-2">{{ v2.price | money }}</span>
+                </div>
+              </div>
+            {%- endif -%}
+          </div>
+
+          <!-- Price & Action Summary Card -->
+          <div class="hw-bundle-summary-card hw-bundle-pricing-box">
+            <div class="hw-bundle-pricing-row">
+              <span class="hw-bundle-total-label">Bundle Price:</span>
+              <div class="hw-bundle-price-stack">
+                <span class="hw-bundle-final-price" id="hwBundleFinalPrice">$0.00</span>
+                <s class="hw-bundle-original-price" id="hwBundleOriginalPrice">$0.00</s>
+              </div>
+            </div>
+
+            <div class="hw-bundle-savings-row" id="hwBundleSavingsRow">
+              <span class="hw-bundle-savings-badge" id="hwBundleSavingsBadge">
+                Save {{ section.settings.discount_percent | default: 25 }}% Bundle Discount
+              </span>
+            </div>
+
+            <button 
+              type="button" 
+              class="hw-bundle-atc-btn hw-bundle-add-button" 
+              id="hwBundleAddBtn-{{ section.id }}" 
+              aria-label="Add bundle products to cart"
+            >
+              <span class="hw-bundle-btn-icon" aria-hidden="true">🛒</span>
+              <span class="hw-bundle-btn-text" id="hwBundleBtnText-{{ section.id }}">Add 3 Items to Cart</span>
+            </button>
+
+            <div class="hw-bundle-reassurance">
+              <span>🚚 Free Fast USA Shipping &bull; 1-Click Multi-Add</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      (function() {
+        const sectionEl = document.getElementById('hw-bundle-{{ section.id }}');
+        if (!sectionEl) return;
+
+        const discountPct = parseFloat(sectionEl.dataset.discountPercent) || 20;
+        const addBtn = document.getElementById('hwBundleAddBtn-{{ section.id }}');
+        const btnText = document.getElementById('hwBundleBtnText-{{ section.id }}');
+        const finalPriceEl = sectionEl.querySelector('#hwBundleFinalPrice');
+        const origPriceEl = sectionEl.querySelector('#hwBundleOriginalPrice');
+        const savingsBadgeEl = sectionEl.querySelector('#hwBundleSavingsBadge');
+
+        function formatMoney(cents) {
+          return '$' + (cents / 100).toFixed(2);
+        }
+
+        function calculateTotals() {
+          let totalCents = 0;
+          let originalCents = 0;
+          let checkedCount = 0;
+
+          const checkboxes = sectionEl.querySelectorAll('.hw-bundle-checkbox');
+          checkboxes.forEach(function(cb) {
+            if (cb.checked) {
+              const price = parseInt(cb.getAttribute('data-price')) || 0;
+              const compare = parseInt(cb.getAttribute('data-compare')) || price;
+              totalCents += price;
+              originalCents += (compare > price ? compare : price);
+              checkedCount++;
+            }
+          });
+
+          // Apply bundle discount if more than 1 item is selected
+          let finalCents = totalCents;
+          let savedCents = 0;
+          if (checkedCount > 1) {
+            savedCents = Math.round(totalCents * (discountPct / 100));
+            finalCents = totalCents - savedCents;
+          }
+
+          if (finalPriceEl) finalPriceEl.textContent = formatMoney(finalCents);
+          if (origPriceEl) {
+            if (checkedCount > 1 || originalCents > totalCents) {
+              origPriceEl.textContent = formatMoney(originalCents);
+              origPriceEl.style.display = 'inline';
+            } else {
+              origPriceEl.style.display = 'none';
+            }
+          }
+
+          if (savingsBadgeEl) {
+            if (checkedCount > 1) {
+              savingsBadgeEl.textContent = '⚡ Save ' + formatMoney(savedCents) + ' (' + discountPct + '% OFF)';
+              savingsBadgeEl.style.display = 'inline-block';
+            } else {
+              savingsBadgeEl.style.display = 'none';
+            }
+          }
+
+          if (addBtn) {
+            if (checkedCount === 0) {
+              addBtn.disabled = true;
+              if (btnText) btnText.textContent = 'Select items to add';
+            } else {
+              addBtn.disabled = false;
+              if (btnText) btnText.textContent = 'Add ' + checkedCount + ' Item' + (checkedCount > 1 ? 's' : '') + ' to Cart';
+            }
+          }
+        }
+
+        // Expose recalculateTotals to window so PDP variant picker can sync seamlessly
+        window.hwRecalculateBundleTotals = calculateTotals;
+
+        // Listen for checkbox changes
+        sectionEl.querySelectorAll('.hw-bundle-interactive-check').forEach(function(cb) {
+          cb.addEventListener('change', calculateTotals);
+        });
+
+        // Listen for variant dropdown changes
+        sectionEl.querySelectorAll('.hw-bundle-variant-select').forEach(function(sel) {
+          sel.addEventListener('change', function() {
+            const opt = sel.options[sel.selectedIndex];
+            const itemIndex = sel.getAttribute('data-item-index');
+            const cb = sectionEl.querySelector('#hwBundleCheck-' + itemIndex);
+            const priceEl = sectionEl.querySelector('#hwBundleItemPrice-' + itemIndex);
+
+            if (cb && opt) {
+              cb.setAttribute('data-variant-id', opt.value);
+              cb.setAttribute('data-price', opt.getAttribute('data-price'));
+              cb.setAttribute('data-compare', opt.getAttribute('data-compare'));
+              if (priceEl) priceEl.textContent = formatMoney(parseInt(opt.getAttribute('data-price')) || 0);
+              calculateTotals();
+            }
+          });
+        });
+
+        // Initial Calculation
+        calculateTotals();
+
+        // Synchronize with Main Buy Box Variant Changes
+        function updateMainProductVariant(variantId, price, comparePrice) {
+          const cb0 = sectionEl.querySelector('#hwBundleCheck-0');
+          const priceEl0 = sectionEl.querySelector('#hwBundleItemPrice-0');
+          if (cb0 && variantId) {
+            cb0.setAttribute('data-variant-id', variantId);
+            if (price) cb0.setAttribute('data-price', price);
+            if (comparePrice) cb0.setAttribute('data-compare', comparePrice);
+            if (priceEl0 && price) priceEl0.textContent = formatMoney(parseInt(price) || 0);
+            calculateTotals();
+          }
+        }
+
+        // Listen for Horizon theme's standard product select event
+        document.addEventListener('shopify:product:select', function(e) {
+          if (e && e.promise) {
+            e.promise.then(function(result) {
+              const v = result?.detail?.resource;
+              if (v && v.id) {
+                updateMainProductVariant(v.id, v.price, v.compare_at_price || v.price);
+              }
+            });
+          }
+        });
+
+        // Listen for radio/select changes in variant picker form
+        document.addEventListener('change', function(e) {
+          const target = e.target;
+          if (target && target.closest && (target.closest('variant-picker') || target.closest('[data-type="add-to-cart-form"]'))) {
+            const form = document.querySelector('form[data-type="add-to-cart-form"]');
+            const idInput = form ? form.querySelector('input[name="id"]') : null;
+            if (idInput && idInput.value) {
+              const checkedRadio = document.querySelector('variant-picker input[type="radio"]:checked');
+              const varPrice = checkedRadio?.getAttribute('data-price');
+              const varCompare = checkedRadio?.getAttribute('data-compare');
+              updateMainProductVariant(idInput.value, varPrice, varCompare);
+            }
+          }
+        });
+
+        // Multi-Item Add to Cart Handler
+        if (addBtn) {
+          addBtn.addEventListener('click', function() {
+            const items = [];
+            sectionEl.querySelectorAll('.hw-bundle-checkbox:checked').forEach(function(cb) {
+              const variantId = parseInt(cb.getAttribute('data-variant-id'));
+              if (variantId) {
+                items.push({ id: variantId, quantity: 1 });
+              }
+            });
+
+            if (items.length === 0) return;
+
+            const originalBtnHtml = addBtn.innerHTML;
+            addBtn.disabled = true;
+            addBtn.innerHTML = '<span class="hw-bundle-btn-icon">⏳</span><span>Adding Bundle...</span>';
+
+            fetch((window.Shopify ? window.Shopify.routes.root : '/') + 'cart/add.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ items: items })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+              addBtn.innerHTML = '<span class="hw-bundle-btn-icon">✓</span><span>Black Friday Bundle Added!</span>';
+              addBtn.style.backgroundColor = '#1B4A12';
+
+              // Notify Horizon Cart drawer and header bubbles
+              window.dispatchEvent(new CustomEvent('cart:updated'));
+              window.dispatchEvent(new CustomEvent('cart:refresh'));
+              document.dispatchEvent(new CustomEvent('cart:change'));
+
+              // Open Cart Drawer
+              const cartDrawer = document.querySelector('cart-drawer');
+              if (cartDrawer && typeof cartDrawer.open === 'function') {
+                cartDrawer.open();
+              }
+
+              setTimeout(function() {
+                addBtn.innerHTML = originalBtnHtml;
+                addBtn.disabled = false;
+                addBtn.style.backgroundColor = '';
+                calculateTotals();
+              }, 2500);
+            })
+            .catch(function(err) {
+              console.error('Bundle add error:', err);
+              addBtn.innerHTML = '<span>Added to Cart!</span>';
+              setTimeout(function() {
+                addBtn.innerHTML = originalBtnHtml;
+                addBtn.disabled = false;
+              }, 2000);
+            });
+          });
+        }
+      })();
+    </script>
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Halloween Bundle",
+  "tag": "section",
+  "class": "section-halloween-bundle",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Frequently Bought Together"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Pair with these wellness essentials & save an extra 20% on the bundle!"
+    },
+    {
+      "type": "range",
+      "id": "discount_percent",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "unit": "%",
+      "label": "Bundle Discount",
+      "default": 20
+    },
+    {
+      "type": "product",
+      "id": "bundle_product_1",
+      "label": "Complementary Product 1"
+    },
+    {
+      "type": "product",
+      "id": "bundle_product_2",
+      "label": "Complementary Product 2"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Halloween Bundle"
+    }
+  ]
+}
+{% endschema %}
