@@ -108,6 +108,13 @@
   if section.type == 'footer'
     assign rendered_text = rendered_text | replace: '<h4>', '<h4 role="heading" aria-level="2">'
   endif
+  if request.page_type == 'collection' and collection != blank
+    if visible_text == blank and collection.description != blank and block_settings.text == blank
+      assign rendered_text = collection.description
+      assign plain_text = collection.description | strip_newlines | strip
+      assign visible_text = plain_text | strip_html
+    endif
+  endif
 %}
 
 {% if fallback_text != blank and visible_text == blank %}

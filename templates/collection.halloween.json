@@ -21,7 +21,7 @@
           "type": "text",
           "name": "Title",
           "settings": {
-            "text": "<h1>{{ closest.collection.title | default: collection.title }}</h1>",
+            "text": "<h1>{{ closest.collection.title }}</h1>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
@@ -47,7 +47,7 @@
           "type": "text",
           "name": "Description",
           "settings": {
-            "text": "{{ closest.collection.description | default: collection.description }}",
+            "text": "{{ closest.collection.description }}",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
