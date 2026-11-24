@@ -26,12 +26,18 @@
 
   assign resolved_loading = loading
   assign is_primary = false
-  if is_main_product_media or media.position == 1
+  if is_main_product_media == true
     assign is_primary = true
     assign resolved_loading = 'eager'
-    assign widths = '360, 540, 750, 900, 1200'
-  elsif resolved_loading == blank
-    assign resolved_loading = 'lazy'
+    assign widths = widths | default: '360, 540, 750, 800, 1000, 1200'
+  elsif is_main_product_media == nil and template.name == 'product' and media.position == 1 and loading != 'lazy'
+    assign is_primary = true
+    assign resolved_loading = 'eager'
+    assign widths = widths | default: '360, 540, 750, 800, 1000, 1200'
+  else
+    if resolved_loading == blank
+      assign resolved_loading = 'lazy'
+    endif
   endif
 
   assign resolved_product = selected_product | default: closest.product | default: product
@@ -65,10 +71,17 @@
   {% liquid
     assign high_res_url = media.preview_image | image_url: width: 3840
     assign fetch_priority = 'auto'
-    assign base_image_width = 1500
+    assign base_image_width = 800
     if is_primary
       assign fetch_priority = 'high'
-      assign base_image_width = 900
+      assign base_image_width = 800
+    elsif preview_image_only
+      assign base_image_width = 540
+      if resolved_loading == 'lazy'
+        assign fetch_priority = 'low'
+      endif
+    elsif resolved_loading == 'lazy'
+      assign fetch_priority = 'low'
     endif
     assign focal_point_style = '--focal-point: ' | append: media.presentation.focal_point | append: ';'
   %}

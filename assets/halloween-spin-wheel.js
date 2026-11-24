@@ -1,3 +1,4 @@
 // Spin wheel disabled for minimal luxury BFCM UI
-window.openHalloweenWheel = function() {};
-window.closeHalloweenWheel = function() {};
+const win = /** @type {any} */ (window);
+win.openHalloweenWheel = function() {};
+win.closeHalloweenWheel = function() {};

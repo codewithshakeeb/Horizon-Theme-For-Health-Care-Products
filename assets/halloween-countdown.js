@@ -152,12 +152,19 @@
   function initFloatingWidgets() {
     const backToTop = document.getElementById('hwScrollToTop') || document.getElementById('hwBackToTopBtn');
     if (backToTop) {
+      let ticking = false;
       window.addEventListener('scroll', function() {
-        if (window.scrollY > 320) {
-          backToTop.classList.add('is-visible');
-          backToTop.style.display = 'flex';
-        } else {
-          backToTop.classList.remove('is-visible');
+        if (!ticking) {
+          window.requestAnimationFrame(function() {
+            if (window.scrollY > 320) {
+              backToTop.classList.add('is-visible');
+              backToTop.style.display = 'flex';
+            } else {
+              backToTop.classList.remove('is-visible');
+            }
+            ticking = false;
+          });
+          ticking = true;
         }
       }, { passive: true });
 

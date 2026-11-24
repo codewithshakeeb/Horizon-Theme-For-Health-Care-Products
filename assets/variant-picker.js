@@ -714,13 +714,12 @@ export default class VariantPicker extends Component {
    * @returns {string[]} The selected options values.
    */
   get selectedOptionsValues() {
-    /** @type {Array<HTMLInputElement | HTMLOptionElement | HTMLElement>} */
+    /** @type {Array<HTMLInputElement | HTMLOptionElement>} */
     const selectedOptions = Array.from(this.querySelectorAll('select option[selected], fieldset input:checked'));
 
     return selectedOptions
       .map((option) => {
-        const optVal = 'value' in option ? option.value : '';
-        return option.dataset?.optionValueId || optVal || '';
+        return option.dataset.optionValueId || option.value || '';
       })
       .filter(Boolean);
   }
@@ -747,6 +746,7 @@ export default class VariantPicker extends Component {
     if (!Array.isArray(variants) || !variants.length) return null;
 
     // Collect all checked values
+    /** @type {Array<HTMLInputElement | HTMLOptionElement>} */
     const checked = Array.from(this.querySelectorAll('fieldset input:checked, select option:checked, select option[selected]'));
     const vals = (selectedOptions.length ? selectedOptions.map((opt) => (typeof opt === 'object' && opt !== null ? opt.value : opt || '')) : checked.map((el) => el.value || ''))
       .map((v) => (v || '').toLowerCase().trim())

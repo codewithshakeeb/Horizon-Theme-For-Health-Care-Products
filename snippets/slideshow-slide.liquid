@@ -34,11 +34,15 @@
       assign grid_template_rows = grid_template_rows | replace: '50dvh', '40dvh'
       assign grid_template_rows_desktop = grid_template_rows_desktop | replace: '70dvh', '60dvh'
   endcase
+  assign is_first_slide = false
+  if index == 0 or index == nil or index == blank
+    assign is_first_slide = true
+  endif
 -%}
 
 <slideshow-slide
   ref="slides[]"
-  aria-hidden="{% if index == 0 %}false{% else %}true{% endif %}"
+  aria-hidden="{% if is_first_slide %}false{% else %}true{% endif %}"
   style="--slideshow-timeline: --slide-{{ index }}; --product-media-fit: {{ media_fit | default: 'cover' }}; {{ grid_template_rows }} {{ grid_template_rows_desktop }}"
   {% if class != blank %}
     class="{{ class }}"

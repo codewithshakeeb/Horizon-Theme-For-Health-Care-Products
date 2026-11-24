@@ -66,6 +66,8 @@
   color: var(--hw-accent) !important;
   font-weight: 700 !important;
   position: relative;
+  text-shadow: 0 0 6px var(--hw-glow);
+  will-change: opacity, transform;
   animation: hwNavGlow 2.4s ease-in-out infinite;
 }
 
@@ -73,11 +75,13 @@
 
   0%,
   100% {
-    text-shadow: 0 0 0 transparent;
+    opacity: 0.88;
+    transform: translateZ(0);
   }
 
   50% {
-    text-shadow: 0 0 8px var(--hw-glow);
+    opacity: 1;
+    transform: translateZ(0);
   }
 }
 
@@ -1901,6 +1905,7 @@ product-card.product-card:hover,
   padding: 0 !important;
   display: -webkit-box !important;
   -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
@@ -4072,6 +4077,7 @@ body.template-product .bfcm-floating-widgets,
   font-weight: 700;
   letter-spacing: 0.3px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18), 0 0 10px rgba(255, 117, 24, 0.3);
+  will-change: transform, opacity;
   animation: hwMediaBadgePulse 3.5s ease-in-out infinite;
   pointer-events: none;
 }
@@ -4089,11 +4095,13 @@ body.template-product .bfcm-floating-widgets,
 
   0%,
   100% {
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18), 0 0 8px rgba(255, 117, 24, 0.25);
+    transform: translateZ(0) scale(1);
+    opacity: 0.95;
   }
 
   50% {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22), 0 0 16px rgba(255, 117, 24, 0.55);
+    transform: translateZ(0) scale(1.02);
+    opacity: 1;
   }
 }
 
@@ -6347,6 +6355,7 @@ body:has(dialog.theme-drawer__dialog[open]) .hw-mobile-sticky-bar {
   transition: color 0.15s ease !important;
   display: -webkit-box !important;
   -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
 }
@@ -7166,9 +7175,9 @@ body,
 }
 
 /* 7.2 Top Hero Slideshow Banner (Full-Fidelity Merchant Image Display) */
-#shopify-section-slideshow_qYzGEa,
-#shopify-section-slideshow_qYzGEa .slideshow,
-#shopify-section-slideshow_qYzGEa .slideshow-section,
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]),
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slideshow,
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slideshow-section,
 .section-slideshow {
   position: relative !important;
   width: 100% !important;
@@ -7177,8 +7186,8 @@ body,
   overflow: hidden !important;
 }
 
-#shopify-section-slideshow_qYzGEa slideshow-slide,
-#shopify-section-slideshow_qYzGEa .slide {
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) slideshow-slide,
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slide {
   position: relative !important;
   width: 100% !important;
   min-height: 480px !important;
@@ -7188,7 +7197,7 @@ body,
   background: transparent !important;
 }
 
-#shopify-section-slideshow_qYzGEa .slide__image-container {
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slide__image-container {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
@@ -7198,8 +7207,8 @@ body,
   overflow: hidden !important;
 }
 
-#shopify-section-slideshow_qYzGEa .slide__image-container img.slide__image,
-#shopify-section-slideshow_qYzGEa .slide__image-container img {
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slide__image-container img.slide__image,
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slide__image-container img {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
@@ -7207,7 +7216,7 @@ body,
   object-position: center !important;
 }
 
-#shopify-section-slideshow_qYzGEa .slide__content {
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slide__content {
   position: relative !important;
   z-index: 3 !important;
   opacity: 1 !important;
@@ -7218,9 +7227,9 @@ body,
   padding: 60px 24px !important;
 }
 
-#shopify-section-slideshow_qYzGEa .slide__content h1,
-#shopify-section-slideshow_qYzGEa .slide__content h2,
-#shopify-section-slideshow_qYzGEa .slide__content p {
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slide__content h1,
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slide__content h2,
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slide__content p {
   color: #FFFFFF !important;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7) !important;
 }
@@ -7234,17 +7243,17 @@ body,
 }
 
 /* Purge cartoon placeholder SVGs/graphics in hero and supply luxury cinematic wellness background */
-#shopify-section-slideshow_qYzGEa,
-#shopify-section-slideshow_qYzGEa .slideshow,
-#shopify-section-slideshow_qYzGEa .slide,
-#shopify-section-slideshow_qYzGEa .slide__image-container {
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]),
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slideshow,
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slide,
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slide__image-container {
   background: radial-gradient(ellipse at 50% 30%, #17421E 0%, #0D2613 50%, #07150B 100%) !important;
   position: relative !important;
   overflow: hidden !important;
 }
 
-#shopify-section-slideshow_qYzGEa .slide svg,
-#shopify-section-slideshow_qYzGEa svg.slide__image,
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) .slide svg,
+:is(#shopify-section-slideshow_qYzGEa, [id*="slideshow_qYzGEa"]) svg.slide__image,
 .slide__image-container svg.slide__image,
 .slide svg[class*="placeholder"],
 .hw-hero-banner svg.placeholder-svg,
@@ -12915,6 +12924,7 @@ svg.slide__image {
         line-height: 1.3 !important;
         display: -webkit-box !important;
         -webkit-line-clamp: 2 !important;
+        line-clamp: 2 !important;
         -webkit-box-orient: vertical !important;
         overflow: hidden !important;
       }

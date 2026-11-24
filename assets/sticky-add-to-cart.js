@@ -69,6 +69,9 @@ class StickyAddToCartComponent extends Component {
   /** @type {boolean} */
   #hiddenByBottom = false;
 
+  /** @type {boolean} */
+  #visibilityTicking = false;
+
   connectedCallback() {
     super.connectedCallback();
 
@@ -156,28 +159,33 @@ class StickyAddToCartComponent extends Component {
    * Evaluates sticky cart visibility strictly based on button position
    */
   #updateStickyBarVisibility = () => {
-    // Rule: Hide immediately if main Add to Cart button is ANYWHERE on screen
-    if (this.#isMainAddToCartOnScreen()) {
-      if (this.#isStuck) this.#hideStickyBar();
-      return;
-    }
+    if (this.#visibilityTicking) return;
+    this.#visibilityTicking = true;
+    window.requestAnimationFrame(() => {
+      this.#visibilityTicking = false;
+      // Rule: Hide immediately if main Add to Cart button is ANYWHERE on screen
+      if (this.#isMainAddToCartOnScreen()) {
+        if (this.#isStuck) this.#hideStickyBar();
+        return;
+      }
 
-    // Rule: Only show if user has scrolled PAST the button (button is completely above viewport)
-    if (!this.#isMainAddToCartScrolledPast()) {
-      if (this.#isStuck) this.#hideStickyBar();
-      return;
-    }
+      // Rule: Only show if user has scrolled PAST the button (button is completely above viewport)
+      if (!this.#isMainAddToCartScrolledPast()) {
+        if (this.#isStuck) this.#hideStickyBar();
+        return;
+      }
 
-    // Rule: Hide if near footer or chat is active
-    if (this.#hiddenByBottom || this.#isChatActive()) {
-      if (this.#isStuck) this.#hideStickyBar();
-      return;
-    }
+      // Rule: Hide if near footer or chat is active
+      if (this.#hiddenByBottom || this.#isChatActive()) {
+        if (this.#isStuck) this.#hideStickyBar();
+        return;
+      }
 
-    // Otherwise show
-    if (!this.#isStuck) {
-      this.#showStickyBar();
-    }
+      // Otherwise show
+      if (!this.#isStuck) {
+        this.#showStickyBar();
+      }
+    });
   };
 
   /**
@@ -237,7 +245,7 @@ class StickyAddToCartComponent extends Component {
       if (waitlistCard) {
         waitlistCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         const emailInput = waitlistCard.querySelector('input[type="email"]');
-        if (emailInput) emailInput.focus();
+        if (emailInput instanceof HTMLElement) emailInput.focus();
       }
       return;
     }
@@ -375,13 +383,14 @@ class StickyAddToCartComponent extends Component {
 
   /**
    * Handles quantity selector update events
-   * @param {QuantitySelectorUpdateEvent} event - The quantity update event
+   * @param {Event} event - The quantity update event
    */
   #handleQuantityUpdate = (event) => {
+    const customEvent = /** @type {QuantitySelectorUpdateEvent} */ (event);
     // Only respond to product page quantity selector updates, not cart drawer
-    if (event.detail.cartLine) return;
+    if (customEvent.detail.cartLine) return;
 
-    this.#currentQuantity = event.detail.quantity;
+    this.#currentQuantity = customEvent.detail.quantity;
     this.#updateButtonText();
   };
 

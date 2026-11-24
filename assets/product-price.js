@@ -16,6 +16,7 @@ import { StandardEvents, ProductSelectEvent } from '@shopify/events';
  * @property {string | null} [option1]
  * @property {string | null} [option2]
  * @property {string | null} [option3]
+ * @property {string | null} [title]
  */
 
 /**

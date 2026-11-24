@@ -86,23 +86,36 @@
   endif
 
   # Generate responsive image attributes
-  assign sizes = '(min-width: 750px) 50vw, 100vw'
+  assign mobile_col_size = '50vw'
+  if section_settings.mobile_columns == '1'
+    assign mobile_col_size = '100vw'
+  elsif section_settings.mobile_card_size
+    assign mobile_col_size = section_settings.mobile_card_size | replace: 'cqw', 'vw'
+  endif
+
+  if section_settings.columns
+    assign col_pct = 100.0 | divided_by: section_settings.columns | round
+    assign sizes = '(min-width: 1200px) [col]vw, (min-width: 750px) 33vw, [m_col]' | replace: '[col]', col_pct | replace: '[m_col]', mobile_col_size
+  else
+    assign sizes = '(min-width: 1200px) 20vw, (min-width: 750px) 33vw, ' | append: mobile_col_size
+  endif
+
   assign lazy_sizes = 'auto, ' | append: sizes
-  assign loading = 'eager'
+  assign loading = 'lazy'
+  if section_index <= 1 and forloop.index0 < 2
+    assign loading = 'eager'
+  endif
 
   # Layout-aware sizing for resource lists
   if section_settings.layout_type
     case section_settings.layout_type
-      when 'grid', 'carousel'
-        assign calculated_width = 100 | divided_by: section_settings.columns | append: 'vw'
-        assign sizes = '(min-width: 750px) [calc-width], 100vw' | replace: '[calc-width]', calculated_width
       when 'editorial', 'bento'
         assign loading = 'lazy'
         assign sizes = lazy_sizes
     endcase
   endif
 
-  assign widths = '240, 352, 832, 1200, 1600, 1920, 2560, 3840'
+  assign widths = '180, 240, 360, 480, 600, 720, 900'
 
   # Generate placeholder info based on content type
   if content_type == 'articles'
@@ -165,7 +178,7 @@
     {%- assign res_img_alt = image_resource.alt | default: closest.collection.title | default: closest.article.title | default: shop.name | truncate: 125 -%}
     {{
       image_resource
-      | image_url: width: 3840
+      | image_url: width: 600
       | image_tag: widths: widths, alt: res_img_alt, class: 'resource-image__image', sizes: sizes, loading: loading
     }}
   </div>

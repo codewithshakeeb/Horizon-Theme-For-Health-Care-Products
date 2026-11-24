@@ -1,8 +1,8 @@
 
 
 {% assign block_settings = block.settings %}
-{%- assign block_index = section.blocks | find_index: 'id', block.id -%}
-{%- assign section_index = section.index -%}
+{%- assign block_index = section.blocks | find_index: 'id', block.id | default: 0 -%}
+{%- assign section_index = section.index | default: 1 -%}
 
 {% capture children %}
   {% liquid
@@ -55,7 +55,7 @@
       {%- liquid
         assign loading = 'eager'
 
-        if block_index > 0 or section_index > 3
+        if block_index > 0 or section_index > 1
           assign loading = 'lazy'
           assign sizes = lazy_sizes
         endif
@@ -64,7 +64,7 @@
         if block_index == 0 and section_index <= 1
           assign fetchpriority = 'high'
         elsif loading == 'lazy'
-          assign fetchpriority = 'low'
+          assign fetchpriority = 'auto'
         endif
 
         assign slide_alt = preview_image.alt | default: shop.name | strip
@@ -167,17 +167,34 @@
   }
 
   /* Guarantee first/single hero slide is immediately visible at first paint for LCP (mobile + desktop) */
+  slideshow-slide:first-child,
+  slideshow-component.slideshow--single-media slideshow-slide,
+  slideshow-slide[aria-hidden='false']:first-child {
+    content-visibility: visible !important;
+  }
+
+  slideshow-slide:first-child .slide__image-container,
+  slideshow-slide:first-child img.slide__image,
+  slideshow-component.slideshow--single-media .slide__image-container,
+  slideshow-component.slideshow--single-media img.slide__image {
+    opacity: 1 !important;
+    visibility: visible !important;
+    content-visibility: visible !important;
+  }
+
   slideshow-component:not([in-viewport]) slideshow-slide:first-child .slide__content,
   slideshow-component.slideshow--single-media .slide__content,
-  slideshow-slide[aria-hidden='false']:first-child .slide__content {
-    opacity: 1;
-    animation: none;
+  slideshow-slide[aria-hidden='false']:first-child .slide__content,
+  slideshow-slide:first-child .slide__content {
+    opacity: 1 !important;
+    animation: none !important;
   }
 
   @media screen and (max-width: 749px) {
+    slideshow-slide:first-child .slide__content,
     slideshow-slide[aria-hidden='false'] .slide__content {
-      opacity: 1;
-      animation: none;
+      opacity: 1 !important;
+      animation: none !important;
     }
   }
 

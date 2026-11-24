@@ -105,9 +105,9 @@
         <link
           rel="preload"
           as="image"
-          href="{{ home_lcp_image | image_url: width: 1100 }}"
-          imagesrcset="{{ home_lcp_image | image_url: width: 360 }} 360w, {{ home_lcp_image | image_url: width: 540 }} 540w, {{ home_lcp_image | image_url: width: 720 }} 720w, {{ home_lcp_image | image_url: width: 900 }} 900w, {{ home_lcp_image | image_url: width: 1100 }} 1100w, {{ home_lcp_image | image_url: width: 1500 }} 1500w"
-          imagesizes="100vw"
+          href="{{ home_lcp_image | image_url: width: 1500 }}"
+          imagesrcset="{{ home_lcp_image | image_url: width: 360 }} 360w, {{ home_lcp_image | image_url: width: 540 }} 540w, {{ home_lcp_image | image_url: width: 720 }} 720w, {{ home_lcp_image | image_url: width: 900 }} 900w, {{ home_lcp_image | image_url: width: 1100 }} 1100w, {{ home_lcp_image | image_url: width: 1500 }} 1500w, {{ home_lcp_image | image_url: width: 1920 }} 1920w"
+          imagesizes="(min-width: 750px) 100vw, 100vw"
           fetchpriority="high"
         >
       {%- endif -%}
@@ -118,8 +118,8 @@
         <link
           rel="preload"
           as="image"
-          href="{{ lcp_image | image_url: width: 900 }}"
-          imagesrcset="{{ lcp_image | image_url: width: 360 }} 360w, {{ lcp_image | image_url: width: 540 }} 540w, {{ lcp_image | image_url: width: 750 }} 750w, {{ lcp_image | image_url: width: 900 }} 900w, {{ lcp_image | image_url: width: 1200 }} 1200w"
+          href="{{ lcp_image | image_url: width: 800 }}"
+          imagesrcset="{{ lcp_image | image_url: width: 360 }} 360w, {{ lcp_image | image_url: width: 540 }} 540w, {{ lcp_image | image_url: width: 750 }} 750w, {{ lcp_image | image_url: width: 800 }} 800w, {{ lcp_image | image_url: width: 1000 }} 1000w, {{ lcp_image | image_url: width: 1200 }} 1200w"
           imagesizes="(min-width: 750px) 50vw, 100vw"
           fetchpriority="high"
         >
@@ -142,7 +142,7 @@
     {%- if halloween_active -%}
       <!-- bfcm:active -->
       {%- render 'halloween-config' -%}
-      {{ 'halloween-styles.css' | asset_url | stylesheet_tag }}
+      {{ 'halloween-styles.css' | asset_url | stylesheet_tag: preload: true }}
       <script>
         (function(){
           var loaded = false;

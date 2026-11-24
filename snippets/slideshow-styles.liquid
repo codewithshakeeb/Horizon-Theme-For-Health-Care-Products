@@ -172,11 +172,13 @@
     overflow: hidden;
 
     slideshow-component[actioned] &,
+    slideshow-component slideshow-slide:first-child,
+    slideshow-component.slideshow--single-media slideshow-slide,
     &[aria-hidden='false'] {
-      content-visibility: visible;
+      content-visibility: visible !important;
     }
 
-    slideshow-component slideshow-slide:not([aria-hidden='false']) {
+    slideshow-component:not(.slideshow--single-media) slideshow-slide:not(:first-child):not([aria-hidden='false']) {
       content-visibility: hidden;
     }
 

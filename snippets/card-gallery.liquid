@@ -43,15 +43,17 @@
     endcapture
     assign image_sizes = sizes_attribute | strip
   elsif section.settings.columns and section.settings.layout_type != 'editorial'
-    assign viewport_width = 100.0 | divided_by: section.settings.columns
+    assign viewport_width = 100.0 | divided_by: section.settings.columns | round
     assign mobile_cols = section.settings.mobile_columns | default: '2'
-    if mobile_cols == '2'
-      assign mobile_vw = '50vw'
-    else
+    if mobile_cols == '1'
       assign mobile_vw = '100vw'
+    else
+      assign mobile_vw = '50vw'
     endif
-    assign sizes_attribute = '(min-width: 750px) [viewport_width]vw, ' | append: mobile_vw | replace: '[viewport_width]', viewport_width
+    assign sizes_attribute = '(min-width: 1200px) [viewport_width]vw, (min-width: 750px) 33vw, ' | append: mobile_vw | replace: '[viewport_width]', viewport_width
     assign image_sizes = sizes_attribute | strip
+  else
+    assign image_sizes = '(min-width: 1200px) 25vw, (min-width: 750px) 33vw, 50vw'
   endif
 
   assign ratio = '1'
@@ -108,7 +110,7 @@
         assign featured_media = product.featured_media
 
         assign featured_media_loading = 'lazy'
-        assign featured_media_sizes = '(max-width: 749px) 50vw, 25vw'
+        assign featured_media_sizes = image_sizes | default: '(max-width: 749px) 50vw, 25vw'
         if section.index == 1 and forloop.index0 < 2
           assign featured_media_loading = 'eager'
         endif
@@ -132,8 +134,9 @@
             media: featured_media,
             sizes: featured_media_sizes,
             loading: featured_media_loading,
-            widths: '240, 360, 540, 720',
+            widths: '180, 240, 360, 540, 720',
             preview_image_only: true,
+            is_main_product_media: false,
             selected_product: product,
             media_index: 1
           %}
@@ -186,7 +189,7 @@
               assign class = media_class | replace: '[media_type]', media.media_type | append: media_class_suffix
 
               capture slideshow_children
-                render 'product-media', media: media, sizes: sizes, loading: loading, widths: '240, 360, 540, 720', preview_image_only: true, selected_product: product, media_index: forloop.index
+                render 'product-media', media: media, sizes: sizes, loading: loading, widths: '180, 240, 360, 540, 720', preview_image_only: true, is_main_product_media: false, selected_product: product, media_index: forloop.index
               endcapture
 
               render 'slideshow-slide', slide_id: media.id, index: forloop.index0, hidden: false, class: class, attributes: attributes, children: slideshow_children, media_fit: media_fit

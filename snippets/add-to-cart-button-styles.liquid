@@ -107,6 +107,8 @@
       stroke-dasharray: 1.5 1.5;
       stroke-dashoffset: -1.5;
       translate: 0 -180%;
+      opacity: 0;
+      transform: translateZ(0) scaleY(0.2);
     }
 
     g {
@@ -139,6 +141,8 @@
 
     .line {
       stroke-dashoffset: 1.5;
+      opacity: 1;
+      transform: translateZ(0) scaleY(1);
     }
 
     .add-to-cart__added {
@@ -178,7 +182,7 @@
       }
 
       .line {
-        transition-property: stroke-dashoffset;
+        transition-property: opacity, transform;
         transition-duration: calc((calc(var(--burst-speed) * 1s)));
         transition-delay: calc(((var(--base-delay) + (var(--check-speed) * var(--step-delay))) * 1s));
         transition-timing-function: var(--ease-out-cubic);
