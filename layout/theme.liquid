@@ -89,8 +89,12 @@
       {%- if collection.handle == 'frontpage' or collection.handle == 'featured-products' or collection.handle == 'sale' or collection.products_count == 0 -%}
         {%- assign should_noindex = true -%}
       {%- endif -%}
-    {%- elsif template.name == 'blog' and blog.articles_count == 0 -%}
-      {%- assign should_noindex = true -%}
+    {%- elsif template.name == 'blog' -%}
+      {%- if blog.handle == 'news' and blog.articles_count < 3 -%}
+        {%- assign should_noindex = true -%}
+      {%- elsif blog.articles_count == 0 -%}
+        {%- assign should_noindex = true -%}
+      {%- endif -%}
     {%- elsif template.name == 'page' -%}
       {%- if page.handle == 'track' or page.handle == 'landing-page' -%}
         {%- assign should_noindex = true -%}

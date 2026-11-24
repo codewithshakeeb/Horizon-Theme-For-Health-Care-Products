@@ -36,6 +36,11 @@
 ></div>
 <collection-component view-event-payload="{{ collection | standard_event_data: 'view' | escape }}">
   {% render 'breadcrumbs' %}
+  {%- if collection.description != blank and section.settings.show_collection_description -%}
+    <div class="collection-intro-description page-width rte">
+      {{ collection.description }}
+    </div>
+  {%- endif -%}
   <results-list
     class="section product-grid-container{% if section.settings.background_color != blank %} color-custom-{{ section.id }}{% endif %}"
     style="--padding-block-start: {{ section.settings.padding-block-start }}px; --padding-block-end: {{ section.settings.padding-block-end }}px;"
@@ -90,6 +95,36 @@
       {% endpaginate %}
     </div>
   </results-list>
+
+  {%- assign col_faqs = collection.metafields.custom.faqs.value | default: collection.metafields.custom.faq.value | default: collection.metafields.custom.faqs | default: collection.metafields.custom.faq -%}
+  {%- if col_faqs != blank -%}
+    <section class="collection-faq-section page-width" aria-labelledby="CollectionFaqs-{{ section.id }}">
+      <h2 id="CollectionFaqs-{{ section.id }}" class="collection-faq-heading">Frequently Asked Questions</h2>
+      <div class="collection-faq-accordion">
+        {%- if col_faqs.first -%}
+          {%- for faq in col_faqs -%}
+            {%- assign q = faq.question | default: faq.heading | default: faq.title | default: faq[0] | strip -%}
+            {%- assign a = faq.answer | default: faq.content | default: faq.body | default: faq[1] | strip -%}
+            {%- if q != blank and a != blank -%}
+              <details class="collection-faq-item">
+                <summary class="collection-faq-summary">
+                  <span class="collection-faq-question">{{ q }}</span>
+                  <span class="collection-faq-icon" aria-hidden="true">+</span>
+                </summary>
+                <div class="collection-faq-answer rte">
+                  {{ a }}
+                </div>
+              </details>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- else -%}
+          <div class="collection-faq-answer rte">
+            {{ col_faqs }}
+          </div>
+        {%- endif -%}
+      </div>
+    </section>
+  {%- endif -%}
 </collection-component>
 
 {% schema %}
@@ -99,6 +134,12 @@
     "templates": ["collection"]
   },
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_collection_description",
+      "label": "Show collection description",
+      "default": false
+    },
     {
       "type": "select",
       "id": "layout_type",

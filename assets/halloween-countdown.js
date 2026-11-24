@@ -263,20 +263,7 @@
     const price = Number(variant.price) || 0;
     const comparePrice = Number(variant.compare_at_price) || price;
 
-    // 1. Update PDP Deal Box Net Price Display (100% in sync with main price)
-    const couponNetPriceEl = document.getElementById('bfcmCouponNetPrice');
-    if (couponNetPriceEl) {
-      const priceNode = couponNetPriceEl.querySelector('.bfcm-net-price');
-      const labelNode = couponNetPriceEl.querySelector('.bfcm-net-price-label');
-      const autoBadgeNode = couponNetPriceEl.querySelector('.bfcm-auto-discount-badge');
-      if (labelNode) labelNode.textContent = 'Black Friday VIP Price:';
-      if (autoBadgeNode) autoBadgeNode.textContent = 'AUTO-APPLIED';
-      if (priceNode) {
-        priceNode.textContent = formatMoney(price);
-      } else {
-        couponNetPriceEl.innerHTML = `<div class="bfcm-net-price-left"><span class="bfcm-net-price-label">Black Friday VIP Price:</span><strong class="bfcm-net-price">${formatMoney(price)}</strong></div><span class="bfcm-auto-discount-badge">AUTO-APPLIED</span>`;
-      }
-    }
+    // 1. PDP Deal Box removed (Task 1)
 
     // 2. Update Main Price & Compare-At Display (Instant 0ms sync)
     const currentPriceEls = document.querySelectorAll(

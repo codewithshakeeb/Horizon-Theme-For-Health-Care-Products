@@ -340,16 +340,6 @@ export default class VariantPicker extends Component {
           });
         }
 
-        // Update Black Friday Deal Card Price to match active variant price exactly
-        document.querySelectorAll('#bfcmCouponNetPrice').forEach((box) => {
-          const netPrice = box.querySelector('.bfcm-net-price');
-          const netLabel = box.querySelector('.bfcm-net-price-label');
-          const autoBadge = box.querySelector('.bfcm-auto-discount-badge');
-          if (netPrice) netPrice.textContent = formattedPrice;
-          if (netLabel) netLabel.textContent = 'Black Friday VIP Price:';
-          if (autoBadge) autoBadge.textContent = 'AUTO-APPLIED';
-        });
-
         // Update checkout/cart ID inputs
         if (variantId) {
           document.querySelectorAll('input[name="id"]').forEach((inp) => {

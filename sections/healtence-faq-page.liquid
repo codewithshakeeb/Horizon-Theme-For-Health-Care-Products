@@ -285,7 +285,7 @@
 
   <!-- Page Header -->
   <header class="healtence-faq-header">
-    <h1 class="healtence-faq-title">{{ page.title | default: section.settings.heading | default: 'Frequently Asked Questions' }}</h1>
+    <h1 class="healtence-faq-title">{{ section.settings.heading | default: page.title | default: 'Healtence FAQ: Shipping, Returns & Product Care' }}</h1>
     {%- if section.settings.subtitle != blank -%}
       <p class="healtence-faq-subtitle">{{ section.settings.subtitle }}</p>
     {%- endif -%}
@@ -404,7 +404,7 @@
       "type": "text",
       "id": "heading",
       "label": "Page Heading",
-      "default": "Frequently Asked Questions"
+      "default": "Healtence FAQ: Shipping, Returns & Product Care"
     },
     {
       "type": "text",

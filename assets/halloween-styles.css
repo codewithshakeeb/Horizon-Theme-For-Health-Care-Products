@@ -13379,3 +13379,91 @@ svg.slide__image {
   outline: 2px solid #1B4A12 !important;
   outline-offset: 2px !important;
 }
+
+/* Task 1: Complete removal of contradictory VIP Price widget */
+#hwPdpDealCard,
+.hw-pdp-deal-card,
+.bfcm-pdp-deal-card {
+  display: none !important;
+}
+
+/* Task 8: Collection Level FAQ Accordion Styles */
+.collection-faq-section {
+  margin: 48px auto 32px auto;
+  padding-inline: var(--page-padding, 20px);
+  max-width: var(--page-width, 1200px);
+}
+
+.collection-faq-heading {
+  font-family: var(--font-heading--family, inherit);
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.collection-faq-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.collection-faq-item {
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.collection-faq-item[open] {
+  border-color: #CBD5E1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.collection-faq-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #1E293B;
+  user-select: none;
+}
+
+.collection-faq-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collection-faq-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  color: #64748B;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.collection-faq-item[open] .collection-faq-icon {
+  transform: rotate(45deg);
+}
+
+.collection-faq-answer {
+  padding: 0 20px 18px 20px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.collection-intro-description {
+  margin: 16px auto 24px auto;
+  padding-inline: var(--page-padding, 20px);
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+

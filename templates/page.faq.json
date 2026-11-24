@@ -3,7 +3,7 @@
     "faq": {
       "type": "healtence-faq-page",
       "settings": {
-        "heading": "Frequently Asked Questions",
+        "heading": "Healtence FAQ: Shipping, Returns & Product Care",
         "subtitle": "Everything you need to know about our ergonomic pain-relief products, US shipping policies, 30-day returns, and customer care.",
         "show_contact_card": true,
         "contact_heading": "Still Have Questions?",

@@ -60,9 +60,7 @@
   </div>
 </div>
 
-<script type="application/ld+json">
-  {{ article | structured_data }}
-</script>
+
 
 {%- assign reviewer_name = article.metafields.custom.reviewer_name.value | default: article.metafields.custom.reviewer_name | strip -%}
 {%- assign reviewer_credentials = article.metafields.custom.reviewer_credentials.value | default: article.metafields.custom.reviewer_credentials | strip -%}

@@ -253,21 +253,8 @@ class ProductPrice extends Component {
    * @param {string} formattedPrice
    */
   #syncDealCardPrice(formattedPrice) {
-    const scope = this.#closestSection || document;
-    const dealPriceEl =
-      scope.querySelector('#bfcmCouponNetPrice .bfcm-net-price') ||
-      document.querySelector('#bfcmCouponNetPrice .bfcm-net-price');
-    const dealLabelEl =
-      scope.querySelector('#bfcmCouponNetPrice .bfcm-net-price-label') ||
-      document.querySelector('#bfcmCouponNetPrice .bfcm-net-price-label');
-    const autoBadgeEl =
-      scope.querySelector('#bfcmCouponNetPrice .bfcm-auto-discount-badge') ||
-      document.querySelector('#bfcmCouponNetPrice .bfcm-auto-discount-badge');
-    if (dealLabelEl) dealLabelEl.textContent = 'Black Friday VIP Price:';
-    if (autoBadgeEl) autoBadgeEl.textContent = 'AUTO-APPLIED';
-    if (dealPriceEl && formattedPrice) {
-      dealPriceEl.textContent = formattedPrice;
-    }
+    // Custom VIP deal card removed per Task 1
+    return;
   }
 
   /**
